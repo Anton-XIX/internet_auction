@@ -1,0 +1,13 @@
+.DS_Store
+.idea/
+
+
+# virtualenv
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+**/migrations/**
+!**/migrations
+!**/migrations/__init__.py
