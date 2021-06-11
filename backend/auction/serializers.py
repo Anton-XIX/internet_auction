@@ -1,14 +1,9 @@
 from rest_framework import serializers
-from .models import EnglishAuction, DutchAuction
+from .models import Auction
 
 
-class EnglishAuctionSerializer(serializers.ModelSerializer):
+class AuctionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = EnglishAuction
+        model = Auction
         fields = '__all__'
 
-
-class DutchAuctionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DutchAuction
-        fields = '__all__'

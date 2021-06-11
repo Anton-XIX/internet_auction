@@ -1,24 +1,22 @@
-from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
-from lot.models import Lot
 
 
-class EnglishAuction(models.Model):
-    start_price = models.DecimalField(max_digits=8, decimal_places=2)
-    reserve_price = models.DecimalField(max_digits=8, decimal_places=2)
-    current_price = models.DecimalField(max_digits=8, decimal_places=2)
-    duration = models.DurationField()
+class Auction(models.Model):
+    ENGLISH = 'En'
+    DUTCH = 'Nl'
+    AUCTION_TYPE = [
+        (ENGLISH, 'English'),
+        (DUTCH, 'Dutch'),
+    ]
 
-    # lot = GenericRelation(Lot, content_type_field='content_type',
-    #     object_id_field='object_id')
-
-
-class DutchAuction(models.Model):
-    objects = None
+    type = models.CharField(max_length=20, choices=AUCTION_TYPE)
     start_price = models.DecimalField(max_digits=8, decimal_places=2)
     reserve_price = models.DecimalField(max_digits=8, decimal_places=2)
     update_frequency = models.DurationField()
     duration = models.DurationField()
+    current_price = models.DecimalField(max_digits=8, decimal_places=2)
 
-    # lot = GenericRelation(Lot, content_type_field='content_type',
-    #     object_id_field='object_id')
+    # class Meta:
+    #     constraints = models.UniqueConstraint(fields=['user'], condition=Q(status='DRAFT'), name='unique_draft_user')
+#
+#

@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import EnglishAuction
-from .models import DutchAuction
+from .models import Auction
 
-admin.site.register(EnglishAuction)
-admin.site.register(DutchAuction)
+
+admin.site.register(Auction)
+
