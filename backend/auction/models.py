@@ -16,6 +16,8 @@ class Auction(models.Model):
     duration = models.DurationField()
     current_price = models.DecimalField(max_digits=8, decimal_places=2)
 
+    def __str__(self):
+        return f'{self.type} - {self.pk}'
     # class Meta:
     #     constraints = models.UniqueConstraint(fields=['user'], condition=Q(status='DRAFT'), name='unique_draft_user')
 #
