@@ -3,6 +3,7 @@ build-dev:
 	docker-compose -f build/dev/docker-compose.yml up -d --build
 
 run-dev:
+	make stop-web
 	docker-compose -f build/dev/docker-compose.yml up -d --build web
 	docker exec -ti dev_web_1 python manage.py makemigrations
 	docker exec -ti dev_web_1 python manage.py migrate
