@@ -6,6 +6,7 @@ from auction.models import Auction
 from item.models import Item
 from django.db import transaction
 
+
 class LotSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lot

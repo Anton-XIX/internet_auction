@@ -16,6 +16,6 @@ class LotRetrieveView(RetrieveAPIView):
     # permission_classes = [IsAuthenticated]
 
 
-class LotCreateTestView(CreateAPIView):
+class LotListCreateTestView(ListCreateAPIView):
     queryset = Lot.objects.all()
     serializer_class = LotNestedSerializer
