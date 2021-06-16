@@ -13,4 +13,5 @@ class AuctionListCreateView(ListCreateAPIView):
 class AuctionRetrieveView(RetrieveAPIView):
     queryset = Auction.objects.all()
     serializer_class = AuctionSerializer
+
     # permission_classes = [IsAuthenticated]

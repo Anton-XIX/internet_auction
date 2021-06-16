@@ -14,3 +14,4 @@ class ItemRetrieveView(RetrieveAPIView):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
     # permission_classes = [IsAuthenticated]
+

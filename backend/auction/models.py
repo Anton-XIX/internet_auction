@@ -18,8 +18,9 @@ class Auction(models.Model):
     start_price = models.DecimalField(max_digits=8, decimal_places=2)
     reserve_price = models.DecimalField(max_digits=8, decimal_places=2)
     duration = models.DurationField()
+    current_price = models.DecimalField(max_digits=8, decimal_places=2, default=start_price)
     update_frequency = models.DurationField(blank=True, null=True)
-    current_price = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
+    buy_now_price = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
 
     # def clean(self):
     #     if self.type == 'En':
@@ -40,7 +41,7 @@ class Auction(models.Model):
     class Meta:
         constraints = [
             models.CheckConstraint(
-                check=(Q(type='En') & Q(current_price__isnull=False)) |
+                check=(Q(type='En') & Q(buy_now_price__isnull=False)) |
                       (Q(type='Nl') & Q(update_frequency__isnull=False)),
                 name='en_auction'
             ),

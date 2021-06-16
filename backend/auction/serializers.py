@@ -7,3 +7,4 @@ class AuctionSerializer(serializers.ModelSerializer):
         model = Auction
         fields = '__all__'
 
+

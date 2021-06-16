@@ -24,7 +24,8 @@ INSTALLED_APPS = [
     'item',
     'auction',
     'user',
-    'rest_framework'
+    'rest_framework',
+    'drf_spectacular',
 ]
 AUTH_USER_MODEL = 'user.CustomUser'
 MIDDLEWARE = [
@@ -40,8 +41,14 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'internet_auction.urls'
 
 REST_FRAMEWORK = {
-
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 20
 }
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Auction API',
+    }
 
 TEMPLATES = [
     {
