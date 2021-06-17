@@ -10,8 +10,7 @@ class AuctionSerializer(serializers.ModelSerializer):
         (DUTCH, 'Dutch'),
     ]
     type = serializers.ChoiceField(choices=AUCTION_TYPE)
+
     class Meta:
         model = Auction
         fields = '__all__'
-
-

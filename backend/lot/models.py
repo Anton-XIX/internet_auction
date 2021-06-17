@@ -9,7 +9,11 @@ class Lot(models.Model):
     auction = models.ForeignKey(Auction, on_delete=models.CASCADE)
     user = models.ForeignKey
     is_active = models.BooleanField(default=True)
+
     # user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE,null=True)
+
+    def __str__(self):
+        return f'{self.item} : {self.auction}'
 
 
 class Offer(models.Model):
