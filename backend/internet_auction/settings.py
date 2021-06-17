@@ -3,15 +3,11 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 SECRET_KEY = 'django-insecure-a_#@h-f2ey_3t$&q5_@l%w0&=h^qnzns6^wy8q7va@m5si(-eg'
 
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
-
-
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -48,7 +44,7 @@ REST_FRAMEWORK = {
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Auction API',
-    }
+}
 
 TEMPLATES = [
     {
@@ -68,9 +64,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'internet_auction.wsgi.application'
 
-
-
-
 DATABASES = {
     "default": {
         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
@@ -81,8 +74,6 @@ DATABASES = {
         "PORT": os.environ.get("SQL_PORT", "5432"),
     }
 }
-
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -99,7 +90,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -110,8 +100,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 STATIC_URL = '/static/'
-
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
