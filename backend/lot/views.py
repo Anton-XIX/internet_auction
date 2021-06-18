@@ -1,6 +1,6 @@
 from .models import Lot
-from .serializers import LotSerializer, LotNestedSerializer
-from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
+from .serializers import LotSerializer, LotNestedSerializer, LotListTestSerializer
+from rest_framework.generics import ListCreateAPIView, RetrieveAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.filters import SearchFilter
 from rest_framework.filters import OrderingFilter
@@ -14,7 +14,7 @@ class LotListCreateView(ListCreateAPIView):
 
 class LotRetrieveView(RetrieveAPIView):
     queryset = Lot.objects.all()
-    serializer_class = LotSerializer
+    serializer_class = LotNestedSerializer
     # permission_classes = [IsAuthenticated]
 
 
@@ -26,4 +26,12 @@ class LotListCreateTestView(ListCreateAPIView):
     serializer_class = LotNestedSerializer
     filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ['item__title']
-    ordering_fields = ['duration', 'price']
+    ordering_fields = ['duration', 'current_price']
+
+
+'''TESTING FUTURE FUNCTIONALITY'''
+
+
+class LotListTestView(ListAPIView):
+    queryset = Lot.objects.all()
+    serializer_class = LotListTestSerializer
