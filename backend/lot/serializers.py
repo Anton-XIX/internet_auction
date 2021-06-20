@@ -7,13 +7,11 @@ from item.models import Item
 from django.db import transaction
 
 
-class LotSerializer(serializers.ModelSerializer):
+
+class OfferSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Lot
+        model = Offer
         fields = '__all__'
-
-
-'''TESTING Writable nested serializer'''
 
 
 class LotNestedSerializer(serializers.ModelSerializer):
@@ -35,16 +33,9 @@ class LotNestedSerializer(serializers.ModelSerializer):
         return lot
 
 
-'''TESTING FUTURE FUNCTIONALITY'''
-
-
-class OfferSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Offer
-        fields = '__all__'
-
-
-class LotListTestSerializer(LotNestedSerializer):
+class LotRetrieveSerializer(serializers.ModelSerializer):
+    item = ItemSerializer()
+    auction = AuctionSerializer()
     offer = OfferSerializer(source='offer_set', many=True)
 
     class Meta:
