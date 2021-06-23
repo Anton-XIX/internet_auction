@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'user',
     'rest_framework',
     'drf_spectacular',
+    'corsheaders',
 ]
 AUTH_USER_MODEL = 'user.CustomUser'
 MIDDLEWARE = [
@@ -32,6 +33,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'internet_auction.urls'
@@ -103,3 +105,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ORIGIN_WHITELIST = ['http://localhost:3000',]
