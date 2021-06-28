@@ -12,7 +12,7 @@ from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveMode
 
 
 class LotListCreateRetrieveViewSet(GenericViewSet, ListModelMixin, CreateModelMixin, RetrieveModelMixin):
-    queryset = Lot.objects.all()
+    queryset = Lot.objects.select_related('auction', 'item')
     serializer_class = LotNestedSerializer
     filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ['item__title']

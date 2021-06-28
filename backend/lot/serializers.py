@@ -18,6 +18,7 @@ class LotNestedSerializer(serializers.ModelSerializer):
     auction = AuctionSerializer()
 
     class Meta:
+        depth = 1
         model = Lot
         fields = '__all__'
 
@@ -25,7 +26,6 @@ class LotNestedSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         item_data = validated_data.pop('item')
         auction_data = validated_data.pop('auction')
-
         item = Item.objects.create(**item_data)
         auction = Auction.objects.create(**auction_data)
         lot = Lot.objects.create(item=item, auction=auction, **validated_data)

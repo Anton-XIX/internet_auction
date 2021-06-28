@@ -31,7 +31,9 @@ class Offer(models.Model):
         super().save(*args, **kwargs)
 
 
-'''Check extra queries, maybe use other way for updating auction current_price. Put into file signals.py '''
+'''Check extra queries, maybe use other way for updating auction current_price. Put into file signals.py 
+    Use pre-save signal instead save or use only save
+'''
 
 
 @receiver(post_save, sender=Offer, dispatch_uid="update_current_price")
