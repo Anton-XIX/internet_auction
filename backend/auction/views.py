@@ -1,17 +1,11 @@
-from .models import Auction
-from .serializers import AuctionSerializer
-from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
+from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import GenericViewSet
+from .serializers import AuctionSerializer
+from .models import Auction
 
 
-class AuctionListCreateView(ListCreateAPIView):
+class AuctionListCreateRetrieveViewSet(GenericViewSet, ListModelMixin, CreateModelMixin, RetrieveModelMixin):
     queryset = Auction.objects.all()
     serializer_class = AuctionSerializer
-    # permission_classes = [IsAuthenticated]
-
-
-class AuctionRetrieveView(RetrieveAPIView):
-    queryset = Auction.objects.all()
-    serializer_class = AuctionSerializer
-
     # permission_classes = [IsAuthenticated]

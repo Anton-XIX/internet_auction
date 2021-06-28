@@ -7,7 +7,6 @@ from item.models import Item
 from django.db import transaction
 
 
-
 class OfferSerializer(serializers.ModelSerializer):
     class Meta:
         model = Offer
@@ -33,11 +32,13 @@ class LotNestedSerializer(serializers.ModelSerializer):
         return lot
 
 
-class LotRetrieveSerializer(serializers.ModelSerializer):
-    item = ItemSerializer()
-    auction = AuctionSerializer()
-    offer = OfferSerializer(source='offer_set', many=True)
-
-    class Meta:
-        model = Lot
-        fields = '__all__'
+'''May be removed'''
+# class LotRetrieveSerializer(serializers.ModelSerializer):
+#     item = ItemSerializer()
+#     auction = AuctionSerializer()
+#     offer = OfferSerializer(source='offer_set', many=True)
+#
+#     class Meta:
+#
+#         model = Lot
+#         fields = '__all__'

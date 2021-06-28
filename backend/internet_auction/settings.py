@@ -68,8 +68,8 @@ WSGI_APPLICATION = 'internet_auction.wsgi.application'
 
 DATABASES = {
     "default": {
-        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR, "db.sqlite3")),
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "auction_dev",
         "USER": os.environ.get("SQL_USER", "auction"),
         "PASSWORD": os.environ.get("SQL_PASSWORD", "auction_pass"),
         "HOST": os.environ.get("SQL_HOST", "localhost"),
@@ -105,6 +105,28 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = False
 
-CORS_ORIGIN_WHITELIST = ['http://localhost:3000',]
+CORS_ORIGIN_WHITELIST = ('http://localhost:3000',)
+
+LOGGING = {
+    'version': 1,
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        }
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+        }
+    },
+    'loggers': {
+        'django.db.backends': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+        }
+    }
+}
