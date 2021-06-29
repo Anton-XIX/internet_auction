@@ -18,7 +18,6 @@ class LotNestedSerializer(serializers.ModelSerializer):
     auction = AuctionSerializer()
 
     class Meta:
-        depth = 1
         model = Lot
         fields = '__all__'
 
