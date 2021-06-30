@@ -3,7 +3,8 @@ version: '3.8'
 services:
   web:
     build: ../../backend
-    command: python manage.py runserver 0.0.0.0:8080
+    command: sh -c "python manage.py makemigrations &&
+                    python manage.py migrate && python manage.py runserver 0.0.0.0:8080"
     volumes:
       - ../../backend:/usr/src/app
     expose:
@@ -15,6 +16,7 @@ services:
     depends_on:
       - db
       - redis
+
 
   db:
     image:  postgres:12.0
