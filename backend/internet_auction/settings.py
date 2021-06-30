@@ -115,6 +115,11 @@ CORS_ORIGIN_WHITELIST = ('http://localhost:3000',)
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
+BROKER_TRANSPORT_OPTIONS = {"visibility_timeout": 3600}
+CELERY_BROKER_URL = "redis://redis:6379/0"
+CELERY_RESULT_BACKEND = "redis://redis:6379/0"
+CELERY_TIMEZONE = 'Europe/Minsk'
+
 
 # LOGGING = {
 #     'version': 1,

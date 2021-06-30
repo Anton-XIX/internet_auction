@@ -14,8 +14,8 @@ class OfferSerializer(serializers.ModelSerializer):
 
 
 class LotNestedSerializer(serializers.ModelSerializer):
-    item = ItemSerializer()
-    auction = AuctionSerializer()
+    item = ItemSerializer(many=False)
+    auction = AuctionSerializer(many=False)
 
     class Meta:
         model = Lot

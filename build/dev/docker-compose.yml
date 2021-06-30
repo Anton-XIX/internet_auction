@@ -14,6 +14,7 @@ services:
       - ../../.env.dev
     depends_on:
       - db
+      - redis
 
   db:
     image:  postgres:12.0
@@ -22,6 +23,36 @@ services:
     env_file:
       - ../../.env.db
 
+  redis:
+      image: "redis:alpine"
+
+
+  celery:
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+    command: celery -A internet_auction worker -l info
+    volumes:
+      - ../../backend:/home/app/web
+    env_file:
+      - ../../.env.dev
+    depends_on:
+      - db
+      - redis
+      - web
+
+  celery-beat:
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+
+    command: celery -A internet_auction beat -l warning
+    volumes:
+      - ../../backend:/usr/src/app
+    env_file:
+      - ../../.env.dev
+    depends_on:
+      - celery
 
 volumes:
   postgres_data:
