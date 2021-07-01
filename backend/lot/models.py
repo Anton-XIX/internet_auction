@@ -28,6 +28,8 @@ class Offer(models.Model):
     def save(self, *args, **kwargs):
         if self.offer_price < self.lot.auction.current_price:
             raise ValueError("Bid is lower then current price")
+        self.lot.auction.current_price = self.offer_price
+        self.lot.auction.save()
         super().save(*args, **kwargs)
 
 

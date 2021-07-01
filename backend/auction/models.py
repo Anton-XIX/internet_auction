@@ -15,10 +15,16 @@ class Auction(models.Model):
     def __str__(self):
         return f'{self.type} - {self.pk}'
 
+    def save(self, *args, **kwargs):
+        if not self.current_price:
+            self.current_price = self.start_price
+        super().save(*args, **kwargs)
+
     class Meta:
         constraints = [
             models.CheckConstraint(
-                check=(Q(type=AuctionType.English) & Q(buy_now_price__isnull=False) & Q(update_frequency__isnull=True)) |
+                check=(Q(type=AuctionType.English) & Q(buy_now_price__isnull=False) & Q(
+                    update_frequency__isnull=True)) |
                       (Q(type=AuctionType.Dutch) & Q(update_frequency__isnull=False) & Q(buy_now_price__isnull=True)),
                 name='auction_fields_check'
             ),

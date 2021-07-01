@@ -1,7 +1,5 @@
 from rest_framework import serializers
 from .models import Lot, Offer
-from item.serializers import ItemSerializer
-from auction.serializers import AuctionSerializer
 from auction.models import Auction
 from item.models import Item
 from django.db import transaction
@@ -14,14 +12,10 @@ class OfferSerializer(serializers.ModelSerializer):
 
 
 class LotNestedSerializer(serializers.ModelSerializer):
-    # item = ItemSerializer(read_only=True)
-    # auction = AuctionSerializer(read_only=True)
-    # auction = serializers.JSONField(write_only=True)
-    # item = serializers.JSONField(write_only=True)
     id = serializers.IntegerField(read_only=True)
     title = serializers.CharField(source='item.title')
     description = serializers.CharField(source='item.description')
-    photo = serializers.FileField(source='item.photo')
+    photo = serializers.FileField(source='item.photo', required=False, allow_null=True)
     type = serializers.CharField(source='auction.type')
     start_price = serializers.CharField(source='auction.start_price')
     reserve_price = serializers.CharField(source='auction.reserve_price')
