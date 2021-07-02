@@ -2,9 +2,9 @@ from django.db import models
 from item.models import Item
 from auction.models import Auction
 from django.contrib.auth import get_user_model
-
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from .tasks import price_changer
 
 
 # from lot.tasks import price_changer
@@ -15,11 +15,17 @@ class Lot(models.Model):
     auction = models.ForeignKey(Auction, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
 
-    # user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE,null=True)
-    # def save(self,*args, **kwargs):
-    #     if self.auction.type == 'Nl':
-    #         from .tasks import price_changer
-    #         price_changer(self.pk)
+    # user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE,null=
+
+    '''
+    TODO: try to give 'is_active' to task ( if is_active -> get lot -> manipulate)
+    Replace '=='Nl'
+    '''
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.auction.type == 'Nl':
+            price_changer.apply_async([self.pk, self.is_active])
 
     def __str__(self):
         return f'{self.pk} - Lot'
@@ -44,18 +50,7 @@ class Offer(models.Model):
     Use pre-save signal instead save or use only save
 '''
 
-'''
-TODO: try to give 'is_active' to task ( if is_active -> get lot -> manipulate)
-'''
-
-
-@receiver(post_save, sender=Lot, dispatch_uid="update_current_price")
-def update_stocks(sender, instance, **kwargs):
-    if instance.auction.type == 'Nl':
-        from .tasks import price_changer
-        price_changer.apply_async([instance.pk])
-
 
 @receiver(post_save, sender=Offer, dispatch_uid="update_current_price")
-def update_stock(sender, instance, **kwargs):
+def set_new_current_price(sender, instance, **kwargs):
     instance.lot.auction.current_price = instance.offer_price
