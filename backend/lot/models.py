@@ -7,12 +7,19 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 
+# from lot.tasks import price_changer
+
+
 class Lot(models.Model):
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     auction = models.ForeignKey(Auction, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
 
     # user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE,null=True)
+    # def save(self,*args, **kwargs):
+    #     if self.auction.type == 'Nl':
+    #         from .tasks import price_changer
+    #         price_changer(self.pk)
 
     def __str__(self):
         return f'{self.pk} - Lot'
@@ -36,6 +43,17 @@ class Offer(models.Model):
 '''Check extra queries, maybe use other way for updating auction current_price. Put into file signals.py 
     Use pre-save signal instead save or use only save
 '''
+
+'''
+TODO: try to give 'is_active' to task ( if is_active -> get lot -> manipulate)
+'''
+
+
+@receiver(post_save, sender=Lot, dispatch_uid="update_current_price")
+def update_stocks(sender, instance, **kwargs):
+    if instance.auction.type == 'Nl':
+        from .tasks import price_changer
+        price_changer.apply_async([instance.pk])
 
 
 @receiver(post_save, sender=Offer, dispatch_uid="update_current_price")
