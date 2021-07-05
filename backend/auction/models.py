@@ -15,10 +15,17 @@ class Auction(models.Model):
     def __str__(self):
         return f'{self.type} - {self.pk}'
 
+    def duration_to_seconds(self):
+        return self.duration.seconds
+
     def save(self, *args, **kwargs):
         if not self.current_price:
             self.current_price = self.start_price
+
         super().save(*args, **kwargs)
+        if self.type == AuctionType.Dutch:
+            from .tasks import price_changer
+            price_changer.apply_async(args=[self.pk], countdown=self.duration_to_seconds())
 
     class Meta:
         constraints = [

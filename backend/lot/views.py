@@ -13,11 +13,14 @@ from rest_framework.parsers import MultiPartParser, FormParser
 
 class LotListCreateRetrieveViewSet(GenericViewSet, ListModelMixin, CreateModelMixin, RetrieveModelMixin):
     # parser_classes = [MultiPartParser, FormParser]
-    queryset = Lot.objects.all()
+    queryset = Lot.objects.select_related('Auction', 'Item')
     serializer_class = LotNestedSerializer
     filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ['item__title']
     ordering_fields = ['duration', 'current_price']
+
+
+'''Select related use in get_queryset'''
 
 
 class OfferCreateViewSet(GenericViewSet, CreateModelMixin):

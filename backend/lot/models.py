@@ -1,13 +1,6 @@
 from django.db import models
 from item.models import Item
 from auction.models import Auction
-from django.contrib.auth import get_user_model
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from .tasks import price_changer
-
-
-# from lot.tasks import price_changer
 
 
 class Lot(models.Model):
@@ -16,16 +9,6 @@ class Lot(models.Model):
     is_active = models.BooleanField(default=True)
 
     # user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE,null=
-
-    '''
-    TODO: try to give 'is_active' to task ( if is_active -> get lot -> manipulate)
-    Replace '=='Nl'
-    '''
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        if self.auction.type == 'Nl':
-            price_changer.apply_async([self.pk, self.is_active])
 
     def __str__(self):
         return f'{self.pk} - Lot'
@@ -44,13 +27,3 @@ class Offer(models.Model):
         self.lot.auction.current_price = self.offer_price
         self.lot.auction.save()
         super().save(*args, **kwargs)
-
-
-'''Check extra queries, maybe use other way for updating auction current_price. Put into file signals.py 
-    Use pre-save signal instead save or use only save
-'''
-
-
-@receiver(post_save, sender=Offer, dispatch_uid="update_current_price")
-def set_new_current_price(sender, instance, **kwargs):
-    instance.lot.auction.current_price = instance.offer_price
