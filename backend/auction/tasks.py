@@ -1,9 +1,6 @@
 from celery import shared_task
-import time
-from django.apps import apps
 from auction.models import Auction
-import celery
-
+from django.db.models import F
 '''Put it in other file'''
 
 
@@ -18,15 +15,15 @@ def get_or_none(classmodel, **kwargs):
 
 
 @shared_task
-def price_changer(auction_id):
-    auction = get_or_none(Auction, pk=auction_id)
-    print(auction_id)
+def price_changer(auction_id, bid_step):
+    auction = Auction.objects.filter(pk=auction_id, lot__is_active=True)
     if auction:
-        auction.current_price += 10
-        auction.save()
+        auction.update(current_price=F('current_price') + bid_step)
+        price_changer.apply_async(args=[auction_id, bid_step], countdown=10)
 
-        price_changer.apply_async(args=[auction_id], countdown=10)
-        # price_changer(auction_id)
+        # auction.current_price += 10
+        # auction.save(update_fields=['current_price'])
+        # res = AsyncResult(price_changer.id)
 
 
-'''Too many calls of task caused by apply_async'''
+'''TODO: add bid value field'''
