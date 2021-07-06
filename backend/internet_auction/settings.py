@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     'lot',
     'item',
     'auction',
+    'offer',
     'user',
     'rest_framework',
     'drf_spectacular',

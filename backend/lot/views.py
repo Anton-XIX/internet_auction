@@ -1,5 +1,5 @@
-from .models import Lot, Offer
-from .serializers import LotNestedSerializer, OfferSerializer
+from .models import Lot
+from .serializers import LotNestedSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.filters import SearchFilter
 from rest_framework.filters import OrderingFilter
@@ -13,7 +13,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 
 class LotListCreateRetrieveViewSet(GenericViewSet, ListModelMixin, CreateModelMixin, RetrieveModelMixin):
     # parser_classes = [MultiPartParser, FormParser]
-    queryset = Lot.objects.select_related('Auction', 'Item')
+    queryset = Lot.objects.select_related('auction', 'item')
     serializer_class = LotNestedSerializer
     filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ['item__title']
@@ -21,8 +21,3 @@ class LotListCreateRetrieveViewSet(GenericViewSet, ListModelMixin, CreateModelMi
 
 
 '''Select related use in get_queryset'''
-
-
-class OfferCreateViewSet(GenericViewSet, CreateModelMixin):
-    queryset = Offer.objects.all()
-    serializer_class = OfferSerializer

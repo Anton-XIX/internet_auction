@@ -1,14 +1,8 @@
 from rest_framework import serializers
-from .models import Lot, Offer
+from .models import Lot
 from auction.models import Auction
 from item.models import Item
 from django.db import transaction
-
-
-class OfferSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Offer
-        fields = '__all__'
 
 
 class LotNestedSerializer(serializers.ModelSerializer):
@@ -16,6 +10,7 @@ class LotNestedSerializer(serializers.ModelSerializer):
     title = serializers.CharField(source='item.title')
     description = serializers.CharField(source='item.description')
     photo = serializers.FileField(source='item.photo', required=False, allow_null=True)
+    auction_id = serializers.CharField(source='auction.pk', read_only=True)
     type = serializers.CharField(source='auction.type')
     start_price = serializers.CharField(source='auction.start_price')
     reserve_price = serializers.CharField(source='auction.reserve_price')
@@ -23,11 +18,12 @@ class LotNestedSerializer(serializers.ModelSerializer):
     current_price = serializers.CharField(source='auction.current_price')
     update_frequency = serializers.CharField(source='auction.update_frequency', required=False)
     buy_now_price = serializers.CharField(source='auction.buy_now_price')
+    is_buy_now_available = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Lot
-        fields = ['id', 'title', 'description', 'photo', 'type', 'start_price', 'reserve_price',
-                  'duration', 'current_price', 'update_frequency', 'buy_now_price', 'is_active']
+        fields = ['id', 'title', 'description', 'photo', 'auction_id', 'type', 'start_price', 'reserve_price',
+                  'duration', 'current_price', 'update_frequency', 'buy_now_price', 'is_active', 'is_buy_now_available']
 
     @transaction.atomic
     def create(self, validated_data):
