@@ -8,11 +8,13 @@ class Auction(models.Model):
     start_price = models.DecimalField(max_digits=8, decimal_places=2)
     reserve_price = models.DecimalField(max_digits=8, decimal_places=2)
     duration = models.DurationField()
+    datetime=models.DateField
     current_price = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
     update_frequency = models.DurationField(blank=True, null=True)
     bid_step = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
     buy_now_price = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
     is_buy_now_available = models.BooleanField(default=True, null=True, blank=True)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f'{self.type} - {self.pk}'
@@ -21,6 +23,8 @@ class Auction(models.Model):
         return self.duration.seconds
 
     def save(self, *args, **kwargs):
+        from .tasks import deactivate_auction
+        # deactivate_auction.apply_async(countdown=10)
         if not self.current_price:
             self.current_price = self.start_price
 

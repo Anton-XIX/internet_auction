@@ -19,6 +19,7 @@ class LotNestedSerializer(serializers.ModelSerializer):
     update_frequency = serializers.CharField(source='auction.update_frequency', required=False)
     buy_now_price = serializers.CharField(source='auction.buy_now_price')
     is_buy_now_available = serializers.BooleanField(source='auction.is_buy_now_available', read_only=True)
+    is_active = serializers.BooleanField(source='auction.is_active', default=True)
 
     class Meta:
         model = Lot
@@ -31,7 +32,7 @@ class LotNestedSerializer(serializers.ModelSerializer):
         auction_data = validated_data.pop('auction')
         item = Item.objects.create(**item_data)
         auction = Auction.objects.create(**auction_data)
-        lot = Lot.objects.create(item=item, auction=auction, is_active=True)
+        lot = Lot.objects.create(item=item, auction=auction)
         return lot
 
 

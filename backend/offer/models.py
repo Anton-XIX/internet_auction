@@ -3,6 +3,7 @@ from auction.models import Auction
 from django.contrib.auth import get_user_model
 from .tasks import send_offer_rejection
 
+
 class Offer(models.Model):
     auction = models.ForeignKey(Auction, on_delete=models.CASCADE)
     offer_price = models.DecimalField(max_digits=8, decimal_places=2)
