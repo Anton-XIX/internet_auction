@@ -10,6 +10,8 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'deactivating_lots': {
         'task': 'auction.tasks.deactivate_auction',
-        'schedule': crontab(minute=1)
+        'schedule': 30
     }
 }
+
+'''TODO: think about schedule of deactivate_auction task'''

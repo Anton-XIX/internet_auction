@@ -1,32 +1,27 @@
+import datetime
+import time
+
 from celery import shared_task
 from auction.models import Auction
 from django.db.models import F
-
-'''Put it in other file'''
-
-
-def get_or_none(classmodel, **kwargs):
-    try:
-        return classmodel.objects.get(**kwargs)
-    except classmodel.MultipleObjectsReturned as e:
-        print('Error:', e)
-
-    except classmodel.DoesNotExist:
-        return None
-
-
-'''TODO: add bid value field'''
+from .utils import duration_to_seconds
 
 
 @shared_task
-def price_changer(auction_id, bid_step):
+def price_changer(auction_id, bid_step, duration):
     auction = Auction.objects.filter(pk=auction_id, is_active=True)
-    if auction:
+    if auction.exists():
         auction.update(current_price=F('current_price') + bid_step)
-        price_changer.apply_async(args=[auction_id, bid_step], countdown=10)
+        price_changer.apply_async(args=[auction_id, bid_step], countdown=duration_to_seconds(duration))
+
+
+'''Duration may be removed from model. Task also works with negative timedelta values. Need to check big timedelta 
+values. Also datetime.timedelta(seconds = 30) should be in variables.py file. '''
 
 
 @shared_task
 def deactivate_auction():
-    auction = Auction.objects.filter(is_active=True)
-    auction.update(is_active=False)
+    auction = Auction.objects.filter(is_active=True, duration__lte=datetime.timedelta(seconds=30))
+
+    if auction.exists():
+        auction.update(is_active=False, duration=F('duration') - datetime.timedelta(seconds=30))

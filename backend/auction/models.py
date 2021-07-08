@@ -1,6 +1,9 @@
 from django.db import models
 from django.db.models import Q
 from .variables import AuctionType
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from .utils import duration_to_seconds
 
 
 class Auction(models.Model):
@@ -8,7 +11,7 @@ class Auction(models.Model):
     start_price = models.DecimalField(max_digits=8, decimal_places=2)
     reserve_price = models.DecimalField(max_digits=8, decimal_places=2)
     duration = models.DurationField()
-    datetime=models.DateField
+
     current_price = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
     update_frequency = models.DurationField(blank=True, null=True)
     bid_step = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
@@ -19,20 +22,11 @@ class Auction(models.Model):
     def __str__(self):
         return f'{self.type} - {self.pk}'
 
-    def duration_to_seconds(self):
-        return self.duration.seconds
-
     def save(self, *args, **kwargs):
-        from .tasks import deactivate_auction
-        # deactivate_auction.apply_async(countdown=10)
         if not self.current_price:
             self.current_price = self.start_price
 
         super().save(*args, **kwargs)
-
-        if self.type == AuctionType.Dutch:
-            from .tasks import price_changer
-            price_changer.apply_async(args=[self.pk, self.bid_step], countdown=self.duration_to_seconds())
 
     class Meta:
         constraints = [
@@ -45,3 +39,15 @@ class Auction(models.Model):
             ),
 
         ]
+
+
+'''Signal calls task for Dutch auction only on creating: signal checks attribute 'created': True if instance is 
+creating  and False if instance was created '''
+
+
+@receiver(post_save, sender=Auction)
+def my_handler(sender, instance, created, **kwargs):
+    if created and instance.type == AuctionType.Dutch:
+        from .tasks import price_changer
+        price_changer.apply_async(args=[instance.pk, instance.bid_step, instance.duration],
+                                  countdown=duration_to_seconds(instance.duration))
