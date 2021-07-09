@@ -1,9 +1,18 @@
-from django.db import models
 from django.db.models import Q
-from .variables import AuctionType
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+from django.db import models
+
 from .utils import duration_to_seconds
+from .variables import AuctionType
+
+
+class AuctionManager(models.Manager):
+    def create(self, *args, **kwargs):
+        obj = super(AuctionManager, self).create(*args, **kwargs)
+        if obj.type == AuctionType.Dutch:
+            from .tasks import price_changer
+            price_changer.apply_async(args=[obj.pk, obj.bid_step, duration_to_seconds(obj.duration)],
+                                      countdown=duration_to_seconds(obj.duration))
+        return obj
 
 
 class Auction(models.Model):
@@ -19,14 +28,20 @@ class Auction(models.Model):
     is_buy_now_available = models.BooleanField(default=True, null=True, blank=True)
     is_active = models.BooleanField(default=True)
 
+    objects = AuctionManager()
+
     def __str__(self):
         return f'{self.type} - {self.pk}'
 
     def save(self, *args, **kwargs):
         if not self.current_price:
             self.current_price = self.start_price
+        # if self.type == AuctionType.Dutch:
 
         super().save(*args, **kwargs)
+        from .tasks import price_changer
+        # transaction.on_commit(lambda :price_changer.apply_async(args=[self.pk, self.bid_step, 10],
+        #                                   countdown=duration_to_seconds(self.duration)))
 
     class Meta:
         constraints = [
@@ -44,10 +59,9 @@ class Auction(models.Model):
 '''Signal calls task for Dutch auction only on creating: signal checks attribute 'created': True if instance is 
 creating  and False if instance was created '''
 
-
-@receiver(post_save, sender=Auction)
-def my_handler(sender, instance, created, **kwargs):
-    if created and instance.type == AuctionType.Dutch:
-        from .tasks import price_changer
-        price_changer.apply_async(args=[instance.pk, instance.bid_step, instance.duration],
-                                  countdown=duration_to_seconds(instance.duration))
+# @receiver(post_save, sender=Auction)
+# def my_handler(sender, instance, created, **kwargs):
+#     if created and instance.type == AuctionType.Dutch:
+#         from .tasks import price_changer
+#         price_changer.apply_async(args=[instance.pk, instance.bid_step, instance.duration],
+#                                   countdown=duration_to_seconds(instance.duration))
