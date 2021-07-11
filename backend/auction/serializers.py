@@ -1,14 +1,11 @@
 from rest_framework import serializers
-from .models import EnglishAuction, DutchAuction
+from .models import Auction
+from .variables import AuctionType
 
 
-class EnglishAuctionSerializer(serializers.ModelSerializer):
+class AuctionSerializer(serializers.ModelSerializer):
+    type = serializers.ChoiceField(choices=AuctionType.choices)
+
     class Meta:
-        model = EnglishAuction
-        fields = '__all__'
-
-
-class DutchAuctionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DutchAuction
+        model = Auction
         fields = '__all__'
