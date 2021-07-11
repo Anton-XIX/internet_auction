@@ -1,17 +1,17 @@
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from item.models import Item
-from auction.models import Auction
 
 
 class Lot(models.Model):
-    item = models.ForeignKey(Item, on_delete=models.CASCADE)
-    auction = models.ForeignKey(Auction, on_delete=models.CASCADE)
-    # is_active = models.BooleanField(default=True)
+    AUCTION_TYPE = [
+        ('En', 'English'),
+        ('Nl', 'Dutch'),
+    ]
 
-
-
-
-    def __str__(self):
-        return f'{self.pk} - Lot'
-
-
+    item = models.OneToOneField(Item, on_delete=models.CASCADE)
+    auction_type = models.CharField(choices=AUCTION_TYPE, max_length=100)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')

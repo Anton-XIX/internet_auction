@@ -1,6 +1,8 @@
-from .views import LotListCreateRetrieveViewSet
-from rest_framework.routers import DefaultRouter
+from django.urls import path
 
-router = DefaultRouter()
-router.register(r'lot', LotListCreateRetrieveViewSet, basename='lot')
-urlpatterns = router.urls
+from .views import LotListCreateView, LotRetrieveView
+
+urlpatterns = [
+    path('lot/', LotListCreateView.as_view()),
+    path('lot/<int:pk>', LotRetrieveView.as_view()),
+]

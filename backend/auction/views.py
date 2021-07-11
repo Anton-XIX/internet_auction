@@ -1,14 +1,28 @@
-from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin
+from .models import EnglishAuction, DutchAuction
+from .serializers import EnglishAuctionSerializer, DutchAuctionSerializer
+from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.viewsets import GenericViewSet
-from .serializers import AuctionSerializer
-from .models import Auction
 
 
-class AuctionListCreateRetrieveViewSet(GenericViewSet, ListModelMixin,
-                                       CreateModelMixin, RetrieveModelMixin,
-                                       UpdateModelMixin):
-    queryset = Auction.objects.all()
-    serializer_class = AuctionSerializer
-    http_method_names = ['get', 'post', 'head', 'patch']
+class EnglishAuctionListCreateView(ListCreateAPIView):
+    queryset = EnglishAuction.objects.all()
+    serializer_class = EnglishAuctionSerializer
+    # permission_classes = [IsAuthenticated]
+
+
+class EnglishAuctionRetrieveView(RetrieveAPIView):
+    queryset = EnglishAuction.objects.all()
+    serializer_class = EnglishAuctionSerializer
+    # permission_classes = [IsAuthenticated]
+
+
+class DutchAuctionListCreateView(ListCreateAPIView):
+    queryset = DutchAuction.objects.all()
+    serializer_class = DutchAuctionSerializer
+    # permission_classes = [IsAuthenticated]
+
+
+class DutchAuctionRetrieveView(RetrieveAPIView):
+    queryset = DutchAuction.objects.all()
+    serializer_class = DutchAuctionSerializer
     # permission_classes = [IsAuthenticated]
