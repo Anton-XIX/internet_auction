@@ -1,3 +1,5 @@
+import datetime
+
 from django.db.models import Q
 from django.db import models
 
@@ -20,7 +22,7 @@ class Auction(models.Model):
     start_price = models.DecimalField(max_digits=8, decimal_places=2)
     reserve_price = models.DecimalField(max_digits=8, decimal_places=2)
     duration = models.DurationField()
-
+    end_date = models.DateTimeField(null=True, blank=True)
     current_price = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
     update_frequency = models.DurationField(blank=True, null=True)
     bid_step = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
@@ -36,12 +38,8 @@ class Auction(models.Model):
     def save(self, *args, **kwargs):
         if not self.current_price:
             self.current_price = self.start_price
-        # if self.type == AuctionType.Dutch:
-
+        self.end_date = datetime.datetime.now() - self.duration
         super().save(*args, **kwargs)
-        from .tasks import price_changer
-        # transaction.on_commit(lambda :price_changer.apply_async(args=[self.pk, self.bid_step, 10],
-        #                                   countdown=duration_to_seconds(self.duration)))
 
     class Meta:
         constraints = [

@@ -10,7 +10,7 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'deactivating_lots': {
         'task': 'auction.tasks.deactivate_auction',
-        'schedule': 30
+        'schedule': 5
     }
 }
 
