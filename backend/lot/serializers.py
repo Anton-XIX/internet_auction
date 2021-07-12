@@ -14,9 +14,10 @@ class LotNestedSerializer(serializers.ModelSerializer):
     type = serializers.CharField(source='auction.type')
     start_price = serializers.CharField(source='auction.start_price')
     reserve_price = serializers.CharField(source='auction.reserve_price')
-    duration = serializers.CharField(source='auction.duration')
+    end_date = serializers.CharField(source='auction.end_date')
     current_price = serializers.CharField(source='auction.current_price')
     update_frequency = serializers.CharField(source='auction.update_frequency', required=False)
+    bid_step = serializers.IntegerField(source='auction.bid_step', required=False)
     buy_now_price = serializers.CharField(source='auction.buy_now_price')
     is_buy_now_available = serializers.BooleanField(source='auction.is_buy_now_available', read_only=True)
     is_active = serializers.BooleanField(source='auction.is_active', default=True)
@@ -24,7 +25,7 @@ class LotNestedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lot
         fields = ['id', 'title', 'description', 'photo', 'auction_id', 'type', 'start_price', 'reserve_price',
-                  'duration', 'current_price', 'update_frequency', 'buy_now_price', 'is_active', 'is_buy_now_available']
+                  'end_date', 'current_price', 'update_frequency','bid_step', 'buy_now_price', 'is_active', 'is_buy_now_available']
 
     @transaction.atomic
     def create(self, validated_data):

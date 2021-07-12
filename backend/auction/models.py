@@ -23,7 +23,7 @@ class Auction(models.Model):
     type = models.CharField(max_length=20, choices=AuctionType.choices)
     start_price = models.DecimalField(max_digits=8, decimal_places=2)
     reserve_price = models.DecimalField(max_digits=8, decimal_places=2)
-    duration = models.DurationField()
+
     end_date = models.DateTimeField(null=True, blank=True)
     current_price = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
     update_frequency = models.DurationField(blank=True, null=True)
@@ -44,7 +44,7 @@ class Auction(models.Model):
     def save(self, *args, **kwargs):
         if not self.current_price:
             self.current_price = self.start_price
-        self.end_date = datetime.datetime.now() - self.duration
+
         super().save(*args, **kwargs)
 
     class Meta:
