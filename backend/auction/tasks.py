@@ -12,8 +12,10 @@ def price_changer(auction_id, bid_step, update_frequency):
         price_changer.apply_async(args=[auction_id, bid_step, update_frequency], countdown=update_frequency)
 
 
+
 @shared_task
-def deactivate_auction():
-    auction = Auction.objects.filter(is_active=True, end_date__lte=datetime.datetime.now())
-    if auction:
-        auction.update(is_active=False)
+def deactivate_auctions():
+    auctions = Auction.objects.filter(is_active=True, end_date__lte=datetime.datetime.now())
+    if auctions:
+        for auction in auctions:
+            auction.deactivate_auction()

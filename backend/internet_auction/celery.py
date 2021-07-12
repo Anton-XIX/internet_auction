@@ -9,7 +9,7 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'deactivating_lots': {
-        'task': 'auction.tasks.deactivate_auction',
+        'task': 'auction.tasks.deactivate_auctions',
         'schedule': 5
     }
 }

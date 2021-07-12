@@ -8,12 +8,14 @@ from .variables import AuctionType
 
 
 class AuctionManager(models.Manager):
+    use_in_migrations = True
+
     def create(self, *args, **kwargs):
         obj = super(AuctionManager, self).create(*args, **kwargs)
         if obj.type == AuctionType.Dutch:
             from .tasks import price_changer
-            price_changer.apply_async(args=[obj.pk, obj.bid_step, duration_to_seconds(obj.duration)],
-                                      countdown=duration_to_seconds(obj.duration))
+            price_changer.apply_async(args=[obj.pk, obj.bid_step, duration_to_seconds(obj.update_frequency)],
+                                      countdown=duration_to_seconds(obj.update_frequency))
         return obj
 
 
@@ -34,6 +36,10 @@ class Auction(models.Model):
 
     def __str__(self):
         return f'{self.type} - {self.pk}'
+
+    def deactivate_auction(self):
+        self.is_active = False
+        self.save()
 
     def save(self, *args, **kwargs):
         if not self.current_price:
