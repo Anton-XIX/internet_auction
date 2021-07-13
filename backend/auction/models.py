@@ -39,7 +39,7 @@ class Auction(models.Model):
 
     def deactivate_auction(self):
         self.is_active = False
-        self.save()
+        self.save(update_fields=['is_active'])
 
     def save(self, *args, **kwargs):
         if not self.current_price:
