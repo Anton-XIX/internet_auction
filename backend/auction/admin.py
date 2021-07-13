@@ -2,15 +2,14 @@ from django.contrib import admin
 from .models import Auction
 from .utils import duration_to_seconds
 from .variables import AuctionType
-from .models import AuctionManager
-from django.utils.translation import ngettext
 import datetime
 import random
+
 
 class AuctionAdmin(admin.ModelAdmin):
     model = Auction
 
-    actions = ['start_updating_auctions','activate_auctions_for_testing']
+    actions = ['start_updating_auctions', 'activate_auctions_for_testing']
 
     def activate_auctions_for_testing(self, request, queryset):
         queryset.update(is_active=True,
@@ -32,8 +31,6 @@ class AuctionAdmin(admin.ModelAdmin):
                                        f'started')
         else:
             self.message_user(request, f'Successfully started updating price for {success_auctions} auctions')
-
-
 
 
 admin.site.register(Auction, AuctionAdmin)

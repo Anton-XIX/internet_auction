@@ -1,7 +1,6 @@
 import os
 from celery import Celery
-from celery.schedules import crontab
-
+from auction.variables import DEACTIVATION_PERIOD
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "internet_auction.settings")
 
 app = Celery("internet_auction")
@@ -10,7 +9,7 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'deactivating_lots': {
         'task': 'auction.tasks.deactivate_auctions',
-        'schedule': 5
+        'schedule': DEACTIVATION_PERIOD
     }
 }
 

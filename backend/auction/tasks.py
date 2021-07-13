@@ -3,6 +3,7 @@ from celery import shared_task
 from auction.models import Auction
 from django.db.models import F
 from celery import group
+from auction.variables import DEACTIVATION_PERIOD
 
 
 @shared_task
@@ -13,12 +14,21 @@ def price_changer(auction_id, bid_step, update_frequency):
         price_changer.apply_async(args=[auction_id, bid_step, update_frequency], countdown=update_frequency)
 
 
-'''Task deactivate_auctions would be optimized!'''
+@shared_task(ignore_result=True)
+def deactivate(auction_id):
+    auction = Auction.objects.filter(pk=auction_id)
+    auction.update(is_active=False)
 
 
-@shared_task
+@shared_task(ignore_result=True)
 def deactivate_auctions():
-    auctions = Auction.objects.filter(is_active=True, end_date__lte=datetime.datetime.now())
+    """
+    This task filter auctions that will be expired in next 5 seconds (would be replaced by variable).
+    Then it creates group of tasks containing tasks for each auction with eta=end_date
+    """
+    auctions = Auction.objects.filter(is_active=True, end_date__lte=datetime.datetime.now() + DEACTIVATION_PERIOD).only(
+        'pk', 'end_date',
+        'is_active')
+
     if auctions:
-        for auction in auctions:
-            auction.deactivate_auction()
+        group_tasks = group([deactivate.apply_async(args=[auction.pk], eta=auction.end_date) for auction in auctions])

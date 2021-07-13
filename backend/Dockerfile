@@ -1,6 +1,9 @@
 FROM python:3.8
 
-WORKDIR /usr/src/app
+ENV HOME=/app
+ENV APP_HOME=/app/web/
+
+WORKDIR $APP_HOME
 
 RUN pip install --upgrade pip
 
@@ -9,16 +12,16 @@ RUN apt-get update \
 
 RUN pip install --no-cache-dir poetry==1.1.6
 
-COPY poetry.lock pyproject.toml /usr/src/app/
+COPY poetry.lock pyproject.toml $APP_HOME/
 
 RUN poetry config virtualenvs.create false
 
 RUN poetry install --no-dev
 
-COPY entrypoint.sh /usr/src/app/entrypoint.sh
+COPY entrypoint.sh $APP_HOME
 
-COPY . /usr/src/app
+COPY . $APP_HOME
 
-ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
+ENTRYPOINT ["/app/web/entrypoint.sh"]
 
 
