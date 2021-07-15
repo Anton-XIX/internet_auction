@@ -6,6 +6,8 @@ from django.db import models
 from .utils import duration_to_seconds
 from .variables import AuctionType
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 class AuctionManager(models.Manager):
     use_in_migrations = True
@@ -27,12 +29,29 @@ class Auction(models.Model):
     end_date = models.DateTimeField(null=True, blank=True)
     current_price = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
     update_frequency = models.DurationField(blank=True, null=True)
+
     bid_step = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
     buy_now_price = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
     is_buy_now_available = models.BooleanField(default=True, null=True, blank=True)
     is_active = models.BooleanField(default=True)
 
     objects = AuctionManager()
+
+    def real_time_update_price(self):
+        channel_layer = get_channel_layer()
+
+        async_to_sync(channel_layer.group_send)(
+            'auction.current_price',
+            {
+                "type": "message",
+                "message": {
+                    "auction": self.pk,
+                    "current_price": float(self.current_price),
+
+
+                },
+            }
+        )
 
     def __str__(self):
         return f'{self.type} - {self.pk}'

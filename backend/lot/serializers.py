@@ -25,7 +25,13 @@ class LotNestedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lot
         fields = ['id', 'title', 'description', 'photo', 'auction_id', 'type', 'start_price', 'reserve_price',
-                  'end_date', 'current_price', 'update_frequency','bid_step', 'buy_now_price', 'is_active', 'is_buy_now_available']
+                  'end_date', 'current_price', 'update_frequency', 'bid_step', 'buy_now_price', 'is_active',
+                  'is_buy_now_available']
+
+    def save(self, **kwargs):
+        obj = super(LotNestedSerializer, self).save(**kwargs)
+        obj.auction.real_time_update_price()
+        return obj
 
     @transaction.atomic
     def create(self, validated_data):
