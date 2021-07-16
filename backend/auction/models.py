@@ -41,7 +41,8 @@ class Auction(models.Model):
         channel_layer = get_channel_layer()
 
         async_to_sync(channel_layer.group_send)(
-            'auction.current_price',
+
+            f'auction_current_price_{self.pk}',
             {
                 "type": "message",
                 "message": {
