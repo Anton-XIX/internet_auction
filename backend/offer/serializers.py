@@ -18,6 +18,7 @@ class OfferSerializer(serializers.ModelSerializer):
         user = validated_data['user']
         auction.current_price = validated_data['offer_price']
         auction.save(update_fields=['current_price'])
+        # if offer was rejected -> real_time_update_price won't be called
         auction.real_time_update_price()
         transaction.on_commit(
             lambda: send_offer_rejection.apply_async(args=[user.email, auction.pk]))

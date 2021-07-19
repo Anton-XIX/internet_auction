@@ -46,8 +46,11 @@ class Auction(models.Model):
             {
                 "type": "message",
                 "message": {
-                    "auction": self.pk,
-                    "current_price": float(self.current_price),
+                    "auction_id": self.pk,
+                    "current_price": str(self.current_price),
+                    "is_active": self.is_active,
+                    "is-buy_now_available":self.is_buy_now_available
+
 
 
                 },
