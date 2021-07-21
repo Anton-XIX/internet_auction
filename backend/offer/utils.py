@@ -3,7 +3,7 @@ from channels.layers import get_channel_layer
 
 
 def send_updates(auction_id, current_price, is_active, is_buy_now_available, offer_id, offer_price, auction,
-                 user):
+                 user, username):
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
 
@@ -19,6 +19,7 @@ def send_updates(auction_id, current_price, is_active, is_buy_now_available, off
                 },
                 "offer_data": {
                     "id": offer_id,
+                    "username": username,
                     "offer_price": str(offer_price),
                     "auction": auction,
                     "user": user,
