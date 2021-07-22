@@ -14,7 +14,7 @@ class LotNestedSerializer(serializers.ModelSerializer):
     type = serializers.CharField(source='auction.type')
     start_price = serializers.CharField(source='auction.start_price')
     reserve_price = serializers.CharField(source='auction.reserve_price')
-    end_date = serializers.CharField(source='auction.end_date')
+    end_date = serializers.DateTimeField(source='auction.end_date', format="%Y-%m-%d %H:%M:%S")
     current_price = serializers.CharField(source='auction.current_price')
     update_frequency = serializers.CharField(source='auction.update_frequency', required=False)
     bid_step = serializers.IntegerField(source='auction.bid_step', required=False)

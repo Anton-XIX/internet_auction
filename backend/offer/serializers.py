@@ -7,7 +7,9 @@ from user.models import CustomUser
 
 
 class OfferSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user.first_name', required=False)
+
+    username = serializers.CharField(source='user.username', required=False)
+
     class Meta:
         model = Offer
         fields = '__all__'
@@ -29,7 +31,7 @@ class OfferSerializer(serializers.ModelSerializer):
         transaction.on_commit(
             lambda: send_updates(auction.pk, auction.current_price, auction.is_active,
                                  auction.is_buy_now_available, offer.pk,
-                                 offer.offer_price, offer.auction.pk, user.pk, user.first_name, ))
+                                 offer.offer_price, offer.auction.pk, user.pk, user.username, ))
         return offer
 
     def validate(self, data):

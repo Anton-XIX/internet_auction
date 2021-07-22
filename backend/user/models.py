@@ -6,11 +6,12 @@ from django.contrib.auth.models import PermissionsMixin
 class UserManager(BaseUserManager):
     use_in_migrations = True
 
-    def create_user(self, first_name, last_name, email,
+    def create_user(self, username, first_name, last_name, email,
                     password):
         if not email:
             raise ValueError('Email is required!')
         user = self.model(
+            username=username,
             first_name=first_name,
             last_name=last_name,
             email=self.normalize_email(email),
@@ -21,8 +22,8 @@ class UserManager(BaseUserManager):
 
         return user
 
-    def create_superuser(self, first_name, last_name, email,password):
-        user = self.create_user(first_name, last_name, email, password=password)
+    def create_superuser(self, username, first_name, last_name, email,password):
+        user = self.create_user(username, first_name, last_name, email, password=password)
         user.is_staff = True
         user.is_superuser = True
         user.save(using=self._db)
@@ -34,13 +35,14 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField('Name', max_length=100)
     last_name = models.CharField('Surname', max_length=100)
     email = models.EmailField('Email', max_length=200, unique=True)
+    username = models.CharField('Username', max_length=25, unique=True)
     is_active = models.BooleanField('Active', default=True)
     is_staff = models.BooleanField('Staff', default=True)
     is_superuser = models.BooleanField('Superuser', default=False)
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name',]
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name',]
 
     class Meta:
         verbose_name = 'User'
