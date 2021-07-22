@@ -9,6 +9,7 @@ from .variables import AuctionType
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
+
 class AuctionManager(models.Manager):
     use_in_migrations = True
 
@@ -36,26 +37,6 @@ class Auction(models.Model):
     is_active = models.BooleanField(default=True)
 
     objects = AuctionManager()
-
-    def real_time_update_price(self):
-        channel_layer = get_channel_layer()
-
-        async_to_sync(channel_layer.group_send)(
-
-            f'auction_current_price_{self.pk}',
-            {
-                "type": "message",
-                "message": {
-                    "auction_id": self.pk,
-                    "current_price": str(self.current_price),
-                    "is_active": self.is_active,
-                    "is-buy_now_available":self.is_buy_now_available
-
-
-
-                },
-            }
-        )
 
     def __str__(self):
         return f'{self.type} - {self.pk}'

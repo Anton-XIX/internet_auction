@@ -20,7 +20,8 @@ class OfferSerializer(serializers.ModelSerializer):
         auction = validated_data['auction']
         user = validated_data['user']
         auction.current_price = validated_data['offer_price']
-        auction.save(update_fields=['current_price'])
+        auction.is_buy_now_available = False
+        auction.save(update_fields=['current_price','is_buy_now_available'])
         # if offer was rejected -> real_time_update_price won't be called
         # send_updates(auction.pk, auction.current_price, auction.is_active, auction.is_buy_now_available, offer.pk,
         #                   offer.offer_price, offer.auction.pk, offer.user.pk, )
