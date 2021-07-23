@@ -4,24 +4,30 @@ from auction.models import Auction
 from django.db.models import F
 from celery import group
 from auction.variables import DEACTIVATION_PERIOD
-from offer.models import Offer
 from django.core.mail import send_mail
 from internet_auction.settings import EMAIL_HOST_USER
+from offer.utils import send_updates
 
 
 @shared_task
 def price_changer(auction_id, bid_step, update_frequency):
-    auction = Auction.objects.filter(pk=auction_id, is_active=True).only('pk', 'current_price', 'is_active')
+    auction = Auction.objects.filter(pk=auction_id, is_active=True).only('pk',
+                                                                         'current_price',
+                                                                         'is_active',
+                                                                         'is_buy_now_available')
+    send_updates(auction.first())
+
     if auction:
-        auction.update(current_price=F('current_price') + bid_step)
+        auction.update(current_price=F('current_price') + bid_step, is_buy_now_available=False)
         price_changer.apply_async(args=[auction_id, bid_step, update_frequency], countdown=update_frequency)
 
 
 @shared_task(ignore_result=True)
 def deactivate(auction_id):
     auction = Auction.objects.get(pk=auction_id)
-    auction.is_active=False
-    auction.save(update_fields=['is_active'])
+    auction.is_active = False
+    auction.is_buy_now_available = False
+    auction.save(update_fields=['is_active', 'is_buy_now_available'])
 
     '''This will be moved into other file'''
     '''If add .only after select_related -> 2 queries instead of 1'''

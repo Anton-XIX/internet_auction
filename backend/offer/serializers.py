@@ -7,7 +7,6 @@ from user.models import CustomUser
 
 
 class OfferSerializer(serializers.ModelSerializer):
-
     username = serializers.CharField(source='user.username', required=False)
 
     class Meta:
@@ -20,19 +19,18 @@ class OfferSerializer(serializers.ModelSerializer):
         auction = validated_data['auction']
         user = validated_data['user']
         auction.current_price = validated_data['offer_price']
-        auction.is_buy_now_available = False
-        auction.save(update_fields=['current_price','is_buy_now_available'])
-        # if offer was rejected -> real_time_update_price won't be called
-        # send_updates(auction.pk, auction.current_price, auction.is_active, auction.is_buy_now_available, offer.pk,
-        #                   offer.offer_price, offer.auction.pk, offer.user.pk, )
-        # auction.real_time_update_price()
+
+        if auction.is_buy_now_available:
+            auction.is_buy_now_available = False
+            auction.is_active = False
+
+        auction.save(update_fields=['current_price', 'is_buy_now_available', 'is_active'])
 
         transaction.on_commit(
             lambda: send_offer_rejection.apply_async(args=[user.email, auction.pk]))
         transaction.on_commit(
-            lambda: send_updates(auction.pk, auction.current_price, auction.is_active,
-                                 auction.is_buy_now_available, offer.pk,
-                                 offer.offer_price, offer.auction.pk, user.pk, user.username, ))
+            lambda: send_updates(auction, offer))
+
         return offer
 
     def validate(self, data):
