@@ -19,11 +19,13 @@ def price_changer(auction_id, bid_step, update_frequency):
 
 @shared_task(ignore_result=True)
 def deactivate(auction_id):
-    auction = Auction.objects.filter(pk=auction_id)
-    auction.update(is_active=False)
+    auction = Auction.objects.get(pk=auction_id)
+    auction.is_active=False
+    auction.save(update_fields=['is_active'])
 
     '''This will be moved into other file'''
-    offer = Offer.objects.filter(auction=auction_id).last()
+    '''If add .only after select_related -> 2 queries instead of 1'''
+    offer = auction.offer_set.select_related('user').last()
     if offer:
         title = f'Dear {offer.user.email}'
         message = f'You TOOK A LOT!!!'
