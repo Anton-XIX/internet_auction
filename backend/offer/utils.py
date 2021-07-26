@@ -1,8 +1,11 @@
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+from django.core.mail import send_mail
+from internet_auction.settings import EMAIL_HOST_USER
+from .variables import OfferType
 
 
-def set_message(auction, offer=None):
+def set_socket_message(auction, offer=None):
     message = {
         "type": "message",
         "message": {
@@ -27,10 +30,28 @@ def set_message(auction, offer=None):
 
 
 def send_updates(auction, offer=None):
-    message = set_message(auction, offer)
+    message = set_socket_message(auction, offer)
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
 
         f'auction_current_price_{auction.id}',
         message
-        )
+    )
+
+
+def set_email_message(auction, user, offer_type, previous_offer=None):
+    email_message = {}
+    if offer_type == OfferType.Bid and previous_offer:
+        email_message['title'] = f'Dear {previous_offer.user.email}'
+        email_message['message'] = f'Your offer was rejected by {user.email}'
+
+    else:
+        email_message['title'] = f'Dear {user.email}'
+        email_message['message'] = f'Your bought lot!'
+
+    return email_message
+
+
+def send_email_message(auction, user, offer_type, previous_offer=None):
+    email_message = set_email_message(auction, user, offer_type, previous_offer=None)
+    send_mail(email_message['title'], email_message['message'], EMAIL_HOST_USER, [previous_offer.user.email, ])

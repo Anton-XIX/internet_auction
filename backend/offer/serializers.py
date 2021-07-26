@@ -1,5 +1,5 @@
 from rest_framework import serializers
-
+from auction.tasks import deactivate
 from .models import Offer
 from .tasks import send_offer_rejection
 from django.db import transaction
@@ -23,14 +23,14 @@ class OfferSerializer(serializers.ModelSerializer):
         user = validated_data['user']
         auction.current_price = validated_data['offer_price']
         if offer.offer_type == OfferType.Buying:
-            auction.deactivate = True
+            deactivate(auction.id)
         if auction.is_buy_now_available:
             auction.is_buy_now_available = False
 
         auction.save(update_fields=['current_price', 'is_buy_now_available', 'deactivate'])
 
         transaction.on_commit(
-            lambda: send_offer_rejection.apply_async(args=[user.email, auction.pk]))
+            lambda: send_offer_rejection.apply_async(args=[user, auction, offer.offer_type]))
         transaction.on_commit(
             lambda: send_updates(auction, offer))
 
