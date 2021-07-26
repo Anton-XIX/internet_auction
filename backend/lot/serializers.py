@@ -20,12 +20,12 @@ class LotNestedSerializer(serializers.ModelSerializer):
     bid_step = serializers.IntegerField(source='auction.bid_step', required=False)
     buy_now_price = serializers.CharField(source='auction.buy_now_price')
     is_buy_now_available = serializers.BooleanField(source='auction.is_buy_now_available', read_only=True)
-    is_active = serializers.BooleanField(source='auction.is_active', default=True)
+    deactivate = serializers.BooleanField(source='auction.deactivate', default=False)
 
     class Meta:
         model = Lot
         fields = ['id', 'title', 'description', 'photo', 'auction_id', 'type', 'start_price', 'reserve_price',
-                  'end_date', 'current_price', 'update_frequency', 'bid_step', 'buy_now_price', 'is_active',
+                  'end_date', 'current_price', 'update_frequency', 'bid_step', 'buy_now_price', 'deactivate',
                   'is_buy_now_available']
 
     def save(self, **kwargs):

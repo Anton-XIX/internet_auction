@@ -11,13 +11,13 @@ from offer.utils import send_updates
 
 @shared_task
 def price_changer(auction_id, bid_step, update_frequency):
-    auction = Auction.objects.filter(pk=auction_id, is_active=True).only('pk',
-                                                                         'current_price',
-                                                                         'is_active',
-                                                                         'is_buy_now_available')
-    send_updates(auction.first())
+    auction = Auction.objects.filter(pk=auction_id, deactivate=False).only('pk',
+                                                                           'current_price',
+                                                                           'deactivate',
+                                                                           'is_buy_now_available')
 
     if auction:
+        send_updates(auction.first())
         auction.update(current_price=F('current_price') + bid_step, is_buy_now_available=False)
         price_changer.apply_async(args=[auction_id, bid_step, update_frequency], countdown=update_frequency)
 
@@ -25,9 +25,9 @@ def price_changer(auction_id, bid_step, update_frequency):
 @shared_task(ignore_result=True)
 def deactivate(auction_id):
     auction = Auction.objects.get(pk=auction_id)
-    auction.is_active = False
+    auction.deactivate = True
     auction.is_buy_now_available = False
-    auction.save(update_fields=['is_active', 'is_buy_now_available'])
+    auction.save(update_fields=['deactivate', 'is_buy_now_available'])
 
     '''This will be moved into other file'''
     '''If add .only after select_related -> 2 queries instead of 1'''
@@ -46,9 +46,9 @@ def deactivate_auctions():
     This task filter auctions that will be expired in DEACTIVATION_PERIOD value.
     Then it creates group of tasks containing tasks for each auction with eta=end_date
     """
-    auctions = Auction.objects.filter(is_active=True, end_date__lte=datetime.datetime.now() + DEACTIVATION_PERIOD).only(
+    auctions = Auction.objects.filter(deactivate=False, end_date__lte=datetime.datetime.now() + DEACTIVATION_PERIOD).only(
         'pk', 'end_date',
-        'is_active')
+        'deactivate')
 
     if auctions:
         group_tasks = group([deactivate.apply_async(args=[auction.pk], eta=auction.end_date) for auction in auctions])

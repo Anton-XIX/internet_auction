@@ -34,7 +34,7 @@ class Auction(models.Model):
     bid_step = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
     buy_now_price = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
     is_buy_now_available = models.BooleanField(default=True, null=True, blank=True)
-    is_active = models.BooleanField(default=True)
+    deactivate = models.BooleanField(default=False)
 
     objects = AuctionManager()
 
@@ -42,8 +42,8 @@ class Auction(models.Model):
         return f'{self.type} - {self.pk}'
 
     def deactivate_auction(self):
-        self.is_active = False
-        self.save(update_fields=['is_active'])
+        self.deactivate = True
+        self.save(update_fields=['deactivate'])
 
     def save(self, *args, **kwargs):
         if not self.current_price:
@@ -57,7 +57,7 @@ class Auction(models.Model):
                 check=(Q(type=AuctionType.English) & Q(buy_now_price__isnull=False) & Q(
                     update_frequency__isnull=True)) & Q(bid_step__isnull=True) |
                       (Q(type=AuctionType.Dutch) & Q(update_frequency__isnull=False) & Q(
-                          buy_now_price__isnull=True) & Q(bid_step__isnull=False)),
+                          buy_now_price__isnull=False) & Q(bid_step__isnull=False)),
                 name='auction_fields_check'
             ),
 

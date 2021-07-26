@@ -1,12 +1,14 @@
 from django.db import models
 from auction.models import Auction
 from django.db import transaction
+from .variables import OfferType
 
 
 class Offer(models.Model):
     auction = models.ForeignKey(Auction, on_delete=models.CASCADE)
     offer_price = models.DecimalField(max_digits=8, decimal_places=2)
     user = models.ForeignKey('user.CustomUser', on_delete=models.CASCADE)
+    offer_type = models.CharField(max_length=15,choices=OfferType.choices, default=OfferType.Bid)
 
     def __str__(self):
         return f'{self.pk} - Bid'

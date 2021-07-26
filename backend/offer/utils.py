@@ -9,7 +9,7 @@ def set_message(auction, offer=None):
             "auction_data": {
                 "auction_id": auction.pk,
                 "current_price": str(auction.current_price),
-                "is_active": auction.is_active,
+                "deactivate": auction.deactivate,
                 "is_buy_now_available": auction.is_buy_now_available
             }}}
 

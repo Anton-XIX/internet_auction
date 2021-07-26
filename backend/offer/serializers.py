@@ -1,8 +1,11 @@
 from rest_framework import serializers
+
 from .models import Offer
-from offer.tasks import send_offer_rejection
+from .tasks import send_offer_rejection
 from django.db import transaction
 from .utils import send_updates
+from .variables import OfferType
+
 from user.models import CustomUser
 
 
@@ -19,12 +22,12 @@ class OfferSerializer(serializers.ModelSerializer):
         auction = validated_data['auction']
         user = validated_data['user']
         auction.current_price = validated_data['offer_price']
-
+        if offer.offer_type == OfferType.Buying:
+            auction.deactivate = True
         if auction.is_buy_now_available:
             auction.is_buy_now_available = False
-            auction.is_active = False
 
-        auction.save(update_fields=['current_price', 'is_buy_now_available', 'is_active'])
+        auction.save(update_fields=['current_price', 'is_buy_now_available', 'deactivate'])
 
         transaction.on_commit(
             lambda: send_offer_rejection.apply_async(args=[user.email, auction.pk]))
@@ -35,6 +38,8 @@ class OfferSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         offer_price = data['offer_price']
-        if offer_price > data['auction'].current_price:
+
+        if offer_price > data['auction'].current_price and not data['auction'].deactivate:
             return data
+
         raise serializers.ValidationError({'offer_price': 'Bis is lower or equal  current price'})
