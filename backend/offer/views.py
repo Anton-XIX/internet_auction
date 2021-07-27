@@ -10,3 +10,4 @@ class OfferCreateViewSet(GenericViewSet, CreateModelMixin, ListModelMixin):
     serializer_class = OfferSerializer
     filter_backends = [SearchFilter]
     search_fields = ['=auction__id']
+

@@ -22,7 +22,7 @@ class OfferSerializer(serializers.ModelSerializer):
         auction = validated_data['auction']
         user = validated_data['user']
         auction.current_price = validated_data['offer_price']
-        if offer.offer_type == OfferType.Buying:
+        if offer.offer_type == OfferType.Buy:
             deactivate(auction.id)
         if auction.is_buy_now_available:
             auction.is_buy_now_available = False
@@ -30,7 +30,7 @@ class OfferSerializer(serializers.ModelSerializer):
         auction.save(update_fields=['current_price', 'is_buy_now_available', 'deactivate'])
 
         transaction.on_commit(
-            lambda: send_offer_rejection.apply_async(args=[user, auction, offer.offer_type]))
+            lambda: send_offer_rejection.apply_async(args=[auction.id, user.email, offer.offer_type]))
         transaction.on_commit(
             lambda: send_updates(auction, offer))
 
@@ -39,7 +39,7 @@ class OfferSerializer(serializers.ModelSerializer):
     def validate(self, data):
         offer_price = data['offer_price']
 
-        if offer_price > data['auction'].current_price and not data['auction'].deactivate:
+        if offer_price > data['auction'].current_price: #and not data['auction'].deactivate:
             return data
 
         raise serializers.ValidationError({'offer_price': 'Bis is lower or equal  current price'})

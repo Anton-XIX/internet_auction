@@ -4,9 +4,7 @@ from auction.models import Auction
 from django.db.models import F
 from celery import group
 from auction.variables import DEACTIVATION_PERIOD
-from django.core.mail import send_mail
-from internet_auction.settings import EMAIL_HOST_USER
-from offer.utils import send_updates
+from offer.utils import send_updates, send_email_message
 
 
 @shared_task
@@ -27,17 +25,13 @@ def deactivate(auction_id):
     auction = Auction.objects.get(pk=auction_id)
     auction.deactivate = True
     auction.is_buy_now_available = False
-    auction.save(update_fields=['deactivate', 'is_buy_now_available'])
+    auction.save(update_fields=['deactivate', 'is_buy_now_available', 'deactivate'])
 
     '''This will be moved into other file'''
     '''If add .only after select_related -> 2 queries instead of 1'''
     offer = auction.offer_set.select_related('user').last()
     if offer:
-        title = f'Dear {offer.user.email}'
-        message = f'You TOOK A LOT!!!'
-        # print(EMAIL_HOST_PASSWORD)
-        mail_sent = send_mail(title, message, EMAIL_HOST_USER, [offer.user.email, ])
-        return mail_sent
+        send_email_message(auction.id, offer.user.email, offer.offer_type)
 
 
 @shared_task(ignore_result=True)

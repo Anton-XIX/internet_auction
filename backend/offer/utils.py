@@ -39,19 +39,21 @@ def send_updates(auction, offer=None):
     )
 
 
-def set_email_message(auction, user, offer_type, previous_offer=None):
+def set_email_message(auction_id, user_email, offer_type, previous_offer=None):
     email_message = {}
     if offer_type == OfferType.Bid and previous_offer:
         email_message['title'] = f'Dear {previous_offer.user.email}'
-        email_message['message'] = f'Your offer was rejected by {user.email}'
+        email_message['message'] = f'Your offer was rejected by {user_email}'
+        email_message['recipient'] = previous_offer.user.email
 
     else:
-        email_message['title'] = f'Dear {user.email}'
+        email_message['title'] = f'Dear {user_email}'
         email_message['message'] = f'Your bought lot!'
+        email_message['recipient'] = user_email
 
     return email_message
 
 
-def send_email_message(auction, user, offer_type, previous_offer=None):
-    email_message = set_email_message(auction, user, offer_type, previous_offer=None)
-    send_mail(email_message['title'], email_message['message'], EMAIL_HOST_USER, [previous_offer.user.email, ])
+def send_email_message(auction_id, user_email, offer_type, previous_offer=None):
+    email_message = set_email_message(auction_id, user_email, offer_type, previous_offer)
+    send_mail(email_message['title'], email_message['message'], EMAIL_HOST_USER, [email_message['recipient'], ])
