@@ -4,6 +4,17 @@ from auction.models import Auction
 from item.models import Item
 from django.db import transaction
 
+from rest_framework_simplejwt.models import TokenUser
+
+
+# token = request.META.get('HTTP_AUTHORIZATION', " ").split(' ')[1]
+# data = {'token': token}
+#    try:
+#       valid_data = TokenBackend(algorithm='HS256').decode(token,verify=False)
+#       user = valid_data['user']
+#       request.user = user
+#    except ValidationError as v:
+#       print("validation error", v)
 
 class LotNestedSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
@@ -22,24 +33,27 @@ class LotNestedSerializer(serializers.ModelSerializer):
     is_buy_now_available = serializers.BooleanField(source='auction.is_buy_now_available', read_only=True)
     deactivate = serializers.BooleanField(source='auction.deactivate', default=False)
 
+
     class Meta:
         model = Lot
         fields = ['id', 'title', 'description', 'photo', 'auction_id', 'type', 'start_price', 'reserve_price',
                   'end_date', 'current_price', 'update_frequency', 'bid_step', 'buy_now_price', 'deactivate',
-                  'is_buy_now_available']
+                  'is_buy_now_available', 'user']
 
-    def save(self, **kwargs):
-        obj = super(LotNestedSerializer, self).save(**kwargs)
-        obj.auction.real_time_update_price()
-        return obj
+    # def save(self, **kwargs):
+    #     obj = super(LotNestedSerializer, self).save(**kwargs)
+    #     obj.auction.real_time_update_price()
+    #     return obj
 
     @transaction.atomic
     def create(self, validated_data):
         item_data = validated_data.pop('item')
         auction_data = validated_data.pop('auction')
+        user = validated_data.pop('user')
         item = Item.objects.create(**item_data)
         auction = Auction.objects.create(**auction_data)
-        lot = Lot.objects.create(item=item, auction=auction)
+
+        lot = Lot.objects.create(item=item, auction=auction,user=user)
         return lot
 
 
