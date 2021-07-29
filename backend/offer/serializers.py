@@ -14,7 +14,7 @@ class OfferSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Offer
-        fields = '__all__'
+        fields = ('auction','offer_price','offer_type','username')
 
     @transaction.atomic()
     def create(self, validated_data):
@@ -30,7 +30,7 @@ class OfferSerializer(serializers.ModelSerializer):
         auction.save(update_fields=['current_price', 'is_buy_now_available', 'deactivate'])
 
         transaction.on_commit(
-            lambda: send_offer_rejection.apply_async(args=[auction.id, user.email, offer.offer_type]))
+            lambda: send_offer_rejection.apply_async(args=[auction.id, user.email, offer.id, offer.offer_type]))
         transaction.on_commit(
             lambda: send_updates(auction, offer))
 

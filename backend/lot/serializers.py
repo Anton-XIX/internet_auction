@@ -38,7 +38,7 @@ class LotNestedSerializer(serializers.ModelSerializer):
         model = Lot
         fields = ['id', 'title', 'description', 'photo', 'auction_id', 'type', 'start_price', 'reserve_price',
                   'end_date', 'current_price', 'update_frequency', 'bid_step', 'buy_now_price', 'deactivate',
-                  'is_buy_now_available', 'user']
+                  'is_buy_now_available']
 
     # def save(self, **kwargs):
     #     obj = super(LotNestedSerializer, self).save(**kwargs)

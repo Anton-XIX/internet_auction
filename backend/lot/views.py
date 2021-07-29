@@ -1,6 +1,6 @@
 from .models import Lot
 from .serializers import LotNestedSerializer
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.filters import SearchFilter
 from rest_framework.filters import OrderingFilter
 
@@ -16,7 +16,7 @@ from rest_framework import status
 
 class LotListCreateRetrieveViewSet(GenericViewSet, ListModelMixin, CreateModelMixin, RetrieveModelMixin):
     # parser_classes = [MultiPartParser, FormParser]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = Lot.objects.select_related('auction', 'item')
     serializer_class = LotNestedSerializer
     filter_backends = [SearchFilter, OrderingFilter]
