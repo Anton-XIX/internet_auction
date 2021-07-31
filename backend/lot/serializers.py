@@ -23,16 +23,15 @@ class LotNestedSerializer(serializers.ModelSerializer):
     photo = serializers.FileField(source='item.photo', required=False, allow_null=True)
     auction_id = serializers.CharField(source='auction.pk', read_only=True)
     type = serializers.CharField(source='auction.type')
-    start_price = serializers.CharField(source='auction.start_price')
-    reserve_price = serializers.CharField(source='auction.reserve_price')
+    start_price = serializers.DecimalField(source='auction.start_price', max_digits=8, decimal_places=2)
+    reserve_price = serializers.DecimalField(source='auction.reserve_price', max_digits=8, decimal_places=2)
     end_date = serializers.DateTimeField(source='auction.end_date', format="%Y-%m-%d %H:%M:%S")
-    current_price = serializers.CharField(source='auction.current_price')
-    update_frequency = serializers.CharField(source='auction.update_frequency', required=False)
-    bid_step = serializers.IntegerField(source='auction.bid_step', required=False)
-    buy_now_price = serializers.CharField(source='auction.buy_now_price')
+    current_price = serializers.DecimalField(source='auction.current_price', max_digits=8, decimal_places=2)
+    update_frequency = serializers.DurationField(source='auction.update_frequency', required=False)
+    bid_step = serializers.DecimalField(source='auction.bid_step', required=False, max_digits=8, decimal_places=2)
+    buy_now_price = serializers.DecimalField(source='auction.buy_now_price', max_digits=8, decimal_places=2)
     is_buy_now_available = serializers.BooleanField(source='auction.is_buy_now_available', read_only=True)
     deactivate = serializers.BooleanField(source='auction.deactivate', default=False)
-
 
     class Meta:
         model = Lot
@@ -53,7 +52,7 @@ class LotNestedSerializer(serializers.ModelSerializer):
         item = Item.objects.create(**item_data)
         auction = Auction.objects.create(**auction_data)
 
-        lot = Lot.objects.create(item=item, auction=auction,user=user)
+        lot = Lot.objects.create(item=item, auction=auction, user=user)
         return lot
 
 

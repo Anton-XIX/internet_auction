@@ -1,14 +1,15 @@
+import pytest
 from django.urls import reverse
-from .models import CustomUser
 from rest_framework import status
-from rest_framework.test import APITestCase
-from rest_framework_simplejwt.tokens import AccessToken
+from lot.serializers import LotNestedSerializer
 
 
-class LotTest(APITestCase):
-
-    def setUp(self):
-        test_user = CustomUser.objects.create_user(email='user@test.', password='testpass', username='TestUser',
-                                                   first_name='Tester', last_name='Test')
-
-        self.user_test_token = AccessToken.for_user(test_user)
+@pytest.mark.usefixtures("lot", "api_client_with_auth")
+def test_retrieve_lot(api_client_with_auth, lot):
+    """
+    Is it good way to concrete data (with serialize)?
+    """
+    response = api_client_with_auth.get(reverse('lot-detail', kwargs={'pk': lot.pk}), format='json')
+    lot_data = LotNestedSerializer(instance=lot)
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data == lot_data.data
