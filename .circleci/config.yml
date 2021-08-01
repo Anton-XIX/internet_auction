@@ -18,9 +18,9 @@ jobs:
           name: Build web, celery and celery beat
           command: docker-compose -f build/dev/docker-compose.yml up -d --build web celery celery beat
 
-      run:
-        name: Run tests
-        command: docker exec -ti dev_web_1 pytest
+      - run:
+          name: Run tests
+          command: docker exec -ti dev_web_1 pytest
 
 
 
