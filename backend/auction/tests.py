@@ -15,8 +15,8 @@ def test_retrieve_auction(api_client_with_auth, english_auction):
     Is it good way to concrete data (with serialize)?
     """
     response = api_client_with_auth.get(reverse('auction-detail', kwargs={'pk': english_auction.id}), format='json')
-    # responce_data = AuctionSerializer(data=response.data)
-    # responce_data.is_valid()
+    # response_data = AuctionSerializer(data=response.data)
+    # response_data.is_valid()
     auction_data = AuctionSerializer(instance=english_auction)
     assert response.status_code == status.HTTP_200_OK
     assert response.data == auction_data.data
@@ -36,7 +36,7 @@ def test_auction_list(api_client_with_auth, response_struct_key_list, english_au
 
     if response.data['count'] > 0:
         response_auction_keys = list(response.data['results'][0].keys())
-        assert next(auction_fields) == response_auction_keys  # if user for for this generator -> endless generator
+        assert next(auction_fields) == response_auction_keys  # if use 'for' for   auction_fields generator -> endless generator
 
 
 @pytest.mark.usefixtures("api_client_with_auth", "english_auction_data", "dutch_auction_data")

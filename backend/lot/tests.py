@@ -5,7 +5,7 @@ from lot.serializers import LotNestedSerializer
 from auction.models import Auction
 from item.models import Item
 from lot.models import Lot
-from backend.conftest import model_field_list
+from ..conftest import model_field_list
 
 
 @pytest.mark.usefixtures("lot", "api_client_with_auth")
