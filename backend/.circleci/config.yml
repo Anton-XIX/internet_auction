@@ -1,0 +1,19 @@
+version: 2
+jobs:
+  build:
+    machine:
+      - image: circleci/classic:edge
+    steps:
+      - checkout
+
+      - run:
+          command: make build-dev
+      - run:
+          command: -f build/dev/docker-compose.yml run dev_web_1 pytest auction/tests.py
+
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build

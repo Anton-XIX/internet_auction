@@ -1,16 +1,19 @@
 import pytest
 from datetime import datetime, timedelta
-
-from django.urls import reverse
 from user.models import CustomUser
 from lot.models import Lot
 from auction.models import Auction
 from auction.variables import AuctionType
 from item.models import Item
-from rest_framework import status
-from rest_framework.test import APITestCase
-from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
+from offer.variables import OfferType
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.test import APIClient
+
+
+def model_field_list(model) -> list:
+    fields = [field.name for field in model._meta.concrete_fields]
+    yield fields
+    # May be it would be better to use set(fields)?
 
 
 @pytest.fixture
@@ -29,7 +32,8 @@ def user(db) -> CustomUser:
 @pytest.fixture
 def english_auction(db) -> Auction:
     auction = Auction.objects.create(type=AuctionType.English, start_price=20.00, reserve_price=20.00,
-                                     end_date=datetime.now() + timedelta(hours=2), current_price=25.00, buy_now_price=150.00)
+                                     end_date=datetime.now() + timedelta(hours=2), current_price=25.00,
+                                     buy_now_price=150.00)
 
     yield auction
     auction.delete()
@@ -42,15 +46,96 @@ def item(db) -> Item:
     yield item
     item.delete()
 
+
 @pytest.fixture
-def lot(db,english_auction,item,user) -> Lot:
+def lot(db, english_auction, item, user) -> Lot:
     lot = Lot.objects.create(item=item, auction=english_auction, user=user)
     yield lot
     lot.delete()
 
 
 @pytest.fixture
-def api_client_with_auth(db,user):
+def response_struct_key_list() -> list:
+    keys = ['count', 'total_pages', 'size', 'results']
+    yield keys
+
+
+@pytest.fixture
+def item_field_list() -> list:
+    fields = [field.name for field in Item._meta.concrete_fields]
+    yield fields
+    # del(fields) ?????
+
+
+@pytest.fixture
+def english_auction_data() -> dict:
+    data = {
+        "type": "En",
+        "start_price": 12,
+        "reserve_price": 50,
+        "end_date": datetime.now() + timedelta(hours=2),
+        "current_price": 25,
+        "buy_now_price": 50,
+        "is_buy_now_available": True,
+        "deactivate": True
+    }
+    yield data
+
+
+@pytest.fixture
+def dutch_auction_data() -> dict:
+    data = {
+        "type": "Nl",
+        "start_price": 12,
+        "reserve_price": 50,
+        "end_date": datetime.now() + timedelta(hours=2),
+        "current_price": 25,
+        "update_frequency": 10,
+        "bid_step": 1,
+        "buy_now_price": 50,
+        "is_buy_now_available": True,
+        "deactivate": True
+    }
+    yield data
+
+
+@pytest.fixture
+def item_data() -> dict:
+    data = {
+        "title": "Test title",
+        "description": "Test descr",
+        "photo": None,
+    }
+    yield data
+
+
+@pytest.fixture
+def offer_data(english_auction, user) -> dict:
+    data = {
+        "auction": english_auction.pk,
+        "offer_price": english_auction.current_price+10,
+        "offer_type": OfferType.Bid
+    }
+    yield data
+
+
+@pytest.fixture
+def auction_field_list() -> list:
+    """
+    Yielding one by one here won't help in test -> in 'for i in fields' i = list of all fields
+    """
+    fields = [field.name for field in Auction._meta.concrete_fields]
+    yield fields
+
+
+@pytest.fixture
+def lot_field_list(lot) -> list:
+    fields = [field.name for field in Auction._meta.concrete_fields]
+    yield fields
+
+
+@pytest.fixture
+def api_client_with_auth(db, user):
     # user = CustomUser.objects.create_user(email='user@test.by', password='testpass', username='TestUser',
     #                                       first_name='Tester', last_name='Test')
     client = APIClient()
@@ -58,6 +143,3 @@ def api_client_with_auth(db,user):
     client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
 
     return client
-
-
-

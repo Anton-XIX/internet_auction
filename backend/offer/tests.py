@@ -1,3 +1,10 @@
-from django.test import TestCase
+import pytest
+from django.urls import reverse
+from rest_framework import status
 
-# Create your tests here.
+
+@pytest.mark.usefixtures("api_client_with_auth", "offer_data")
+def test_post_offer(api_client_with_auth, offer_data):
+    response = api_client_with_auth.post(reverse('offer-list'), data=offer_data, format='json')
+
+    assert response.status_code == status.HTTP_201_CREATED
