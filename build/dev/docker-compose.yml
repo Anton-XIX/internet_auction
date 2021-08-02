@@ -5,7 +5,7 @@ services:
     build: ../../backend
     command: sh -c "python manage.py runserver 0.0.0.0:8080"
     volumes:
-      - ../../backend:/usr/src/app
+      - ../../backend:/app/web/
     expose:
       - 8080
     ports:
@@ -54,6 +54,21 @@ services:
       - ../../.env.dev
     depends_on:
       - celery
+
+  tests:
+    build: ../../backend
+    command: sh -c "pytest"
+    volumes:
+      - ../../backend:/app/web/
+    expose:
+      - 8080
+    ports:
+      - "8080:8080"
+    env_file:
+      - ../../.env.dev
+    depends_on:
+      - db
+      - redis
 
 volumes:
   postgres_data:

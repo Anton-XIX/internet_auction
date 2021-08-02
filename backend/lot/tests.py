@@ -2,17 +2,11 @@ import pytest
 from django.urls import reverse
 from rest_framework import status
 from lot.serializers import LotNestedSerializer
-from auction.models import Auction
-from item.models import Item
-from lot.models import Lot
-from ..conftest import model_field_list
 
 
 @pytest.mark.usefixtures("lot", "api_client_with_auth")
 def test_retrieve_lot(api_client_with_auth, lot):
-    """
-    Check only status code or try to check retrieved data??
-    """
+
     response = api_client_with_auth.get(reverse('lot-detail', kwargs={'pk': lot.pk}), format='json')
     lot_data = LotNestedSerializer(instance=lot)
     assert response.status_code == status.HTTP_200_OK

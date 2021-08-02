@@ -10,11 +10,13 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.test import APIClient
 
 
-def model_field_list(model) -> list:
-    fields = [field.name for field in model._meta.concrete_fields]
-    yield fields
-    # May be it would be better to use set(fields)?
 
+#
+# @pytest.fixture(scope="module")
+# def user_tt(django_db_blocker):
+#     with django_db_blocker.unblock():
+#         return CustomUser.objects.create_user(email='user@test.by', password='testpass', username='TestUser',
+#                                           first_name='Tester', last_name='Test')
 
 @pytest.fixture
 def user(db) -> CustomUser:
@@ -62,13 +64,17 @@ def response_struct_key_list() -> list:
 
 @pytest.fixture
 def item_field_list() -> list:
-    fields = [field.name for field in Item._meta.concrete_fields]
+    fields = [
+        "id",
+        "title",
+        "description",
+        "photo"
+    ]
     yield fields
-    # del(fields) ?????
 
 
 @pytest.fixture
-def english_auction_data() -> dict:
+def english_auction_post_data() -> dict:
     data = {
         "type": "En",
         "start_price": 12,
@@ -83,7 +89,7 @@ def english_auction_data() -> dict:
 
 
 @pytest.fixture
-def dutch_auction_data() -> dict:
+def dutch_auction_post_data() -> dict:
     data = {
         "type": "Nl",
         "start_price": 12,
@@ -100,7 +106,7 @@ def dutch_auction_data() -> dict:
 
 
 @pytest.fixture
-def item_data() -> dict:
+def item_post_data() -> dict:
     data = {
         "title": "Test title",
         "description": "Test descr",
@@ -110,10 +116,10 @@ def item_data() -> dict:
 
 
 @pytest.fixture
-def offer_data(english_auction, user) -> dict:
+def offer_post_data(english_auction, user) -> dict:
     data = {
         "auction": english_auction.pk,
-        "offer_price": english_auction.current_price+10,
+        "offer_price": english_auction.current_price + 10,
         "offer_type": OfferType.Bid
     }
     yield data
@@ -121,16 +127,40 @@ def offer_data(english_auction, user) -> dict:
 
 @pytest.fixture
 def auction_field_list() -> list:
-    """
-    Yielding one by one here won't help in test -> in 'for i in fields' i = list of all fields
-    """
-    fields = [field.name for field in Auction._meta.concrete_fields]
+    fields = [
+        "id",
+        "type",
+        "start_price",
+        "reserve_price",
+        "end_date",
+        "current_price",
+        "update_frequency",
+        "bid_step", "buy_now_price",
+        "is_buy_now_available",
+        "deactivate"
+    ]
     yield fields
 
 
 @pytest.fixture
 def lot_field_list(lot) -> list:
-    fields = [field.name for field in Auction._meta.concrete_fields]
+    fields = [
+        "id",
+        "title",
+        "description",
+        "photo",
+        "auction_id",
+        "type",
+        "start_price",
+        "reserve_price",
+        "end_date",
+        "current_price",
+        "update_frequency",
+        "bid_step",
+        "buy_now_price",
+        "deactivate",
+        "is_buy_now_available"
+    ]
     yield fields
 
 
