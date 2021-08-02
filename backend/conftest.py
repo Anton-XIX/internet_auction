@@ -10,9 +10,41 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.test import APIClient
 
 
+from django.db import connections
+import psycopg2
+from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
+# #
+# def run_sql(sql):
+#     conn = psycopg2.connect(database='test_auction_dev', user='auction',password='auction_pass', host='db', port='5432')
+#     conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+#     cur = conn.cursor()
+#     cur.execute(sql)
+#     conn.close()
+# #
+# #
+# @pytest.fixture(scope='session')
+# def django_db_setup(django_db_use_migrations):
+#     from django.conf import settings
+#     settings.DATABASES['default']['NAME'] = 'test_auction_dev'
 #
-# @pytest.fixture(scope="module")
+#     # run_sql('DROP DATABASE IF EXISTS test_auction_dev')
+#     # run_sql('CREATE DATABASE test_auction_dev TEMPLATE auction_dev ')
+#     print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+#     yield
+#     for connection in connections.all():
+#         connection.close()
+#     # run_sql('DROP DATABASE test_auction_dev')
+# # ENGINE": "django.db.backends.postgresql",
+# #         "NAME": "auction_dev",
+# #         "USER": os.environ.get("SQL_USER", "auction"),
+# #         "PASSWORD": os.environ.get("SQL_PASSWORD", "auction_pass"),
+# #         "HOST": os.environ.get("SQL_HOST", "localhost"),
+# #         "PORT": os.environ.get("SQL_PORT", "5432"),
+#
+# #
+# @pytest.mark.django_db
+# @pytest.fixture(scope="function")
 # def user_tt(django_db_blocker):
 #     with django_db_blocker.unblock():
 #         return CustomUser.objects.create_user(email='user@test.by', password='testpass', username='TestUser',
@@ -20,6 +52,7 @@ from rest_framework.test import APIClient
 
 @pytest.fixture
 def user(db) -> CustomUser:
+
     """
     Does 'yield' better than 'return' in my case?
 
@@ -27,8 +60,11 @@ def user(db) -> CustomUser:
     """
     user = CustomUser.objects.create_user(email='user@test.by', password='testpass', username='TestUser',
                                           first_name='Tester', last_name='Test')
+
+
+
     yield user
-    user.delete()
+
 
 
 @pytest.fixture
@@ -165,7 +201,7 @@ def lot_field_list(lot) -> list:
 
 
 @pytest.fixture
-def api_client_with_auth(db, user):
+def api_client_with_auth(user):
     # user = CustomUser.objects.create_user(email='user@test.by', password='testpass', username='TestUser',
     #                                       first_name='Tester', last_name='Test')
     client = APIClient()
