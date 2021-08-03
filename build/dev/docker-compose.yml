@@ -55,17 +55,17 @@ services:
     depends_on:
       - celery
 
-  test_db:
-    image: postgres:12.0
-    volumes:
-      - /var/lib/postgresql/data/
-    env_file:
-      - ../../.env.test.db
+#  test_db:
+#    image: postgres:12.0
+#    volumes:
+#      - /var/lib/postgresql/data/
+#    env_file:
+#      - ../../.env.test.db
 
 
   tests:
     build: ../../backend
-    command: sh -c "pytest"
+    command: sh -c "python manage.py migrate && pytest \tests"
     volumes:
       - ../../backend:/app/web/
     expose:

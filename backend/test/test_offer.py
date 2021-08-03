@@ -4,7 +4,7 @@ from rest_framework import status
 
 
 class TestOffer:
-
+    @pytest.mark.django_db
     def test_post_offer(self, api_client_with_auth, offer_post_data):
         response = api_client_with_auth.post(reverse('offer-list'), data=offer_post_data, format='json')
 

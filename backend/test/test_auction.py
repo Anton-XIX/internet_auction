@@ -6,8 +6,9 @@ from auction.serializers import AuctionSerializer
 
 @pytest.mark.django_db
 class TestAuction:
-
+    @pytest.mark.django_db
     def test_retrieve_auction(self, api_client_with_auth, english_auction):
+
         response = api_client_with_auth.get(reverse('auction-detail', kwargs={'pk': english_auction.id}), format='json')
         # response_data = AuctionSerializer(data=response.data)
         # response_data.is_valid()
@@ -16,6 +17,7 @@ class TestAuction:
         assert response.status_code == status.HTTP_200_OK
         assert response.data == auction_data.data
 
+    @pytest.mark.django_db
     def test_auction_list(self, api_client_with_auth, response_struct_key_list, auction_field_list, english_auction):
         response = api_client_with_auth.get(reverse('auction-list'), format='json')
 
