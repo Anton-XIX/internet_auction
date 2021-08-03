@@ -4,13 +4,13 @@ from rest_framework import status
 from lot.serializers import LotNestedSerializer
 
 
-@pytest.mark.usefixtures("lot", "api_client_with_auth")
-def test_retrieve_lot(api_client_with_auth, lot):
-
-    response = api_client_with_auth.get(reverse('lot-detail', kwargs={'pk': lot.pk}), format='json')
-    lot_data = LotNestedSerializer(instance=lot)
-    assert response.status_code == status.HTTP_200_OK
-    assert response.data == lot_data.data
+# @pytest.mark.usefixtures("lot", "api_client_with_auth")
+# def test_retrieve_lot(api_client_with_auth, lot):
+#
+#     response = api_client_with_auth.get(reverse('lot-detail', kwargs={'pk': lot.pk}), format='json')
+#     lot_data = LotNestedSerializer(instance=lot)
+#     assert response.status_code == status.HTTP_200_OK
+#     assert response.data == lot_data.data
 
 
 # @pytest.mark.usefixtures("api_client_with_auth", "response_struct_key_list")

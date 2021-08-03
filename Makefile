@@ -9,6 +9,10 @@ run-web:
 	docker exec -ti dev_web_1 python manage.py migrate
 	docker-compose -f build/dev/docker-compose.yml up -d --build celery celery-beat
 
+run-test:
+	docker-compose -f build/dev/docker-compose.yml up -d --build tests
+
+
 
 stop-dev:
 	docker-compose -f build/dev/docker-compose.yml down -v
