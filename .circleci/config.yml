@@ -30,7 +30,7 @@ jobs:
 
       - run:
           name: Run tests
-          command: docker exec -ti dev_web_1 pytest
+          command: docker-compose -f build/dev/docker-compose.yml up -d --build test
 
 
 
