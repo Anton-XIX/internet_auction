@@ -7,6 +7,7 @@ from lot.models import Lot
 from auction.models import Auction
 from auction.variables import AuctionType
 from item.models import Item
+from offer.models import Offer
 from offer.variables import OfferType
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.test import APIClient
@@ -19,7 +20,13 @@ from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 @pytest.fixture(autouse=True)
 def enable_db_access_for_all_tests(db):
+    """
+
+    Fixture receives db fixture that triggers creating test db
+
+    """
     pass
+
 
 @pytest.fixture(scope='session')
 def django_db_setup(django_db_setup):
@@ -62,22 +69,11 @@ def lot(django_db_blocker, english_auction, item, user) -> Lot:
         lot = Lot.objects.create(item=item, auction=english_auction, user=user)
     yield lot
 
-
 @pytest.fixture(scope='module')
-def response_struct_key_list() -> list:
-    keys = ['count', 'total_pages', 'size', 'results']
-    yield keys
-
-
-@pytest.fixture
-def item_field_list() -> list:
-    fields = [
-        "id",
-        "title",
-        "description",
-        "photo"
-    ]
-    yield fields
+def offer(django_db_blocker, english_auction, user) -> Offer:
+    with django_db_blocker.unblock():
+        offer = Offer.objects.create(auction=english_auction, user=user, offer_type=OfferType.Bid,offer_price=100)
+    yield lot
 
 
 @pytest.fixture
@@ -123,6 +119,26 @@ def item_post_data() -> dict:
 
 
 @pytest.fixture
+def lot_post_data() -> dict:
+    fields = {
+        "title": 'Test Lot',
+        "description": 'Test Lot',
+        "photo": None,
+        "type": 'En',
+        "start_price": 250,
+        "reserve_price": 452,
+        "end_date": datetime.now() + timedelta(hours=2),
+        "current_price": 250,
+        "update_frequency": None,
+        "bid_step": None,
+        "buy_now_price": 2000,
+        "deactivate": False,
+
+    }
+    yield fields
+
+
+@pytest.fixture
 def offer_post_data(english_auction, user) -> dict:
     data = {
         "auction": english_auction.pk,
@@ -130,6 +146,23 @@ def offer_post_data(english_auction, user) -> dict:
         "offer_type": OfferType.Bid
     }
     yield data
+
+
+@pytest.fixture(scope='module')
+def response_struct_key_list() -> list:
+    keys = ['count', 'total_pages', 'size', 'results']
+    yield keys
+
+
+@pytest.fixture
+def item_field_list() -> list:
+    fields = [
+        "id",
+        "title",
+        "description",
+        "photo"
+    ]
+    yield fields
 
 
 @pytest.fixture
@@ -150,7 +183,7 @@ def auction_field_list() -> list:
 
 
 @pytest.fixture
-def lot_field_list(lot) -> list:
+def lot_field_list() -> list:
     fields = [
         "id",
         "title",
@@ -170,6 +203,16 @@ def lot_field_list(lot) -> list:
     ]
     yield fields
 
+
+@pytest.fixture
+def offer_field_list() -> list:
+    fields = [
+        "auction",
+        "offer_price",
+        "offer_type",
+        "username"
+    ]
+    yield fields
 
 @pytest.fixture(scope='module')
 def api_client():

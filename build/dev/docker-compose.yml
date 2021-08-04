@@ -65,7 +65,7 @@ services:
 
   tests:
     build: ../../backend
-    command: sh -c "python manage.py migrate && pytest \tests"
+    command: sh -c "python manage.py migrate && pytest \test"
     volumes:
       - ../../backend:/app/web/
     expose:

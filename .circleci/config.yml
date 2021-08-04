@@ -20,9 +20,9 @@ jobs:
 #      - run:
 #          name: Make migrations
 #          command: docker exec -ti dev_web_1 python manage.py makemigrations
-      - run:
-          name: Migrate
-          command: docker exec -ti dev_web_1 python manage.py migrate
+#      - run:
+#          name: Migrate
+#          command: docker exec -ti dev_web_1 python manage.py migrate
 
 #      - run:
 #          name: Build celery and celery-beat
