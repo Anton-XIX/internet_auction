@@ -30,7 +30,7 @@ jobs:
 
       - run:
           name: Run tests
-          command: docker-compose -f build/dev/docker-compose.yml up -d --build test
+          command: docker-compose -f build/dev/docker-compose.yml up -d --build tests
 
 
 
