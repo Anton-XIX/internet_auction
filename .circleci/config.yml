@@ -1,0 +1,42 @@
+version: 2
+jobs:
+  build:
+
+    machine:
+      image: ubuntu-2004:202010-01
+    steps:
+      - checkout
+      - run:
+          name: Install make
+          command: sudo apt install make
+#      - run:
+#          name: Build postgres and redis
+#          command: docker-compose -f build/dev/docker-compose.yml up -d --build db redis
+#
+#      - run:
+#          name: Build web
+#          command: docker-compose -f build/dev/docker-compose.yml up -d --build web
+
+#      - run:
+#          name: Make migrations
+#          command: docker exec -ti dev_web_1 python manage.py makemigrations
+#      - run:
+#          name: Migrate
+#          command: docker exec -ti dev_web_1 python manage.py migrate
+
+#      - run:
+#          name: Build celery and celery-beat
+#          command: docker-compose -f build/dev/docker-compose.yml up -d --build celery celery-beat
+
+      - run:
+          name: Run tests
+          command: docker-compose -f build/dev/docker-compose.yml up -d --build tests
+
+
+
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build

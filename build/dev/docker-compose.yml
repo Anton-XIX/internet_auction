@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  web:
+    build: ../../backend
+    command: sh -c "python manage.py runserver 0.0.0.0:8080"
+    volumes:
+      - ../../backend:/app/web/
+    expose:
+      - 8080
+    ports:
+      - "8080:8080"
+    env_file:
+      - ../../.env.dev
+    depends_on:
+      - db
+      - redis
+
+
+  db:
+    image:  postgres:12.0
+    volumes:
+      - /var/lib/postgresql/data/
+    env_file:
+      - ../../.env.db
+
+  redis:
+      image: "redis:alpine"
+
+
+  celery:
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+    command: celery -A internet_auction worker -l info
+    volumes:
+      - ../../backend:/home/app/web
+    env_file:
+      - ../../.env.dev
+    depends_on:
+      - db
+      - redis
+      - web
+
+  celery-beat:
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+
+    command: celery -A internet_auction beat -l warning
+    volumes:
+      - ../../backend:/usr/src/app
+    env_file:
+      - ../../.env.dev
+    depends_on:
+      - celery
+
+#  test_db:
+#    image: postgres:12.0
+#    volumes:
+#      - /var/lib/postgresql/data/
+#    env_file:
+#      - ../../.env.test.db
+
+
+  tests:
+    build: ../../backend
+    command: sh -c "python manage.py migrate && pytest \test"
+    volumes:
+      - ../../backend:/app/web/
+    expose:
+      - 8000
+    ports:
+      - "8000:8000"
+    env_file:
+      - ../../.env.dev
+    depends_on:
+      - db
+      - redis
+
+volumes:
+  postgres_data:
